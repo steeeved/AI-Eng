@@ -1,0 +1,65 @@
+[
+  {
+    "id": "classic",
+    "text": "The animal didn't cross the street because it was too tired",
+    "tokens": [
+      "The",
+      "animal",
+      "didn't",
+      "cross",
+      "the",
+      "street",
+      "because",
+      "it",
+      "was",
+      "too",
+      "tired"
+    ]
+  },
+  {
+    "id": "simple",
+    "text": "She promised to call him after the meeting ended",
+    "tokens": [
+      "She",
+      "promised",
+      "to",
+      "call",
+      "him",
+      "after",
+      "the",
+      "meeting",
+      "ended"
+    ]
+  },
+  {
+    "id": "code",
+    "text": "The function returns the value that the loop computed",
+    "tokens": [
+      "The",
+      "function",
+      "returns",
+      "the",
+      "value",
+      "that",
+      "the",
+      "loop",
+      "computed"
+    ]
+  },
+  {
+    "id": "king",
+    "text": "The king gave the queen a crown and a sword",
+    "tokens": [
+      "The",
+      "king",
+      "gave",
+      "the",
+      "queen",
+      "a",
+      "crown",
+      "and",
+      "a",
+      "sword"
+    ]
+  }
+]
