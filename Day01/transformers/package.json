@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "postinstall": "ln -sf ../lightningcss-darwin-arm64/lightningcss.darwin-arm64.node node_modules/lightningcss/lightningcss.darwin-arm64.node",
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS='--no-deprecation' next dev",
     "build": "next build",
     "start": "next start"
   },
