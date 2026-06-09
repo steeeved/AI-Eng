@@ -1,0 +1,28 @@
+{
+  "name": "ai-cli-cost-calculator",
+  "version": "1.0.0",
+  "description": "CLI to compare token counts and API costs across AI models",
+  "type": "module",
+  "bin": {
+    "ai-cli-cost-calculator": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "dev": "node --watch src/cli.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "cli-table3": "^0.6.5",
+    "dotenv": "^17.4.2",
+    "gpt-tokenizer": "^2.8.2",
+    "minimist": "^1.2.8"
+  },
+  "keywords": [
+    "ai",
+    "cost",
+    "tokens",
+    "llm",
+    "cli"
+  ],
+  "license": "MIT"
+}
