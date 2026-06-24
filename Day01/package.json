@@ -1,0 +1,11 @@
+{
+	"dependencies": {
+		"@anthropic-ai/sdk": "^0.100.1",
+		"dotenv": "^17.4.2",
+		"langsmith": "^0.7.3",
+		"openai": "^6.41.0"
+	},
+	"devDependencies": {
+		"tsx": "^4.22.4"
+	}
+}

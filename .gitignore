@@ -1,3 +1,27 @@
+# Environment
+.env.local
+.env.*.local
+.env
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+.tsbuildinfo
+
+# pnpm
+.pnpm-store/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
 node_modules/
 dist/
 build/

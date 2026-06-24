@@ -1,0 +1,28 @@
+{
+  "name": "transformers",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "ln -sf ../lightningcss-darwin-arm64/lightningcss.darwin-arm64.node node_modules/lightningcss/lightningcss.darwin-arm64.node",
+    "dev": "NODE_OPTIONS='--no-deprecation' next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@types/d3": "^7.4.3",
+    "d3": "^7.9.0",
+    "gpt-tokenizer": "^3.4.0",
+    "ml-pca": "^4.1.1",
+    "next": "16.2.6",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
