@@ -22,3 +22,17 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+*.log
+npm-debug.log*
+bun.lock
+.DS_Store
+*.tsbuildinfo
+.next/
+coverage/
+.turbo/
