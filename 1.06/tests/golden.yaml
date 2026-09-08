@@ -1,0 +1,130 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# GOLDEN SET — 1.05 standup extractor
+#
+# Three cases are written. You write the rest.
+#
+# Rules that keep this set worth having:
+#   1. One behaviour per case. If a case fails you must know why without reading it.
+#   2. Realistic messy input. Paste real standup wording — fragments, typos, no
+#      punctuation. Clean prose passes everything and proves nothing.
+#   3. Hard negatives are compulsory. Text with no task, text that looks like a
+#      task and isn't. A set where everything is extractable measures nothing.
+#   4. `today` is pinned on every case. Never let a case depend on the clock.
+#   5. Assert the one thing the case is about. `is-json` and the ISO date check
+#      already run on every case from defaultTest — don't restate them.
+#
+# COVERAGE CHECKLIST — pick your own inputs for each, don't reuse mine:
+#   [x] happy path, single task, relative deadline          (case 1)
+#   [x] hard negative: chatter with no task                 (case 2)
+#   [x] blocker ownership, semantic                         (case 3)
+#   [x] no deadline stated -> dueDate must be null, not guessed
+#   [ ] absolute date stated ("by the 15th") -> correct ISO
+#   [ ] ambiguous date ("next week") -> whatever you decide is correct, decide it
+#   [ ] multiple tasks in one sentence, correct split
+#   [ ] task already completed -> status completed, not assigned
+#   [ ] task dropped/descoped
+#   [ ] unassigned task -> assignee null, status unassigned
+#   [ ] priority stated explicitly ("this is urgent")
+#   [ ] priority NOT stated -> unknown, not inferred
+#   [ ] a decision, not a task
+#   [ ] a decision and a task in the same line
+#   [ ] Sheng / Swahili-English code-switching (your actual users talk like this)
+#   [ ] emoji + Slack formatting noise
+#   [ ] contradictory statement ("Ann will do it, actually Ben will")
+#   [ ] a question that is not a task ("should we move the deploy?")
+#   [ ] very long dump, 6+ tasks, ordering of ids
+#   [ ] near-duplicate task mentioned twice -> not double-extracted
+#
+# Uncomment the stub at the bottom and fill it in per case.
+# ─────────────────────────────────────────────────────────────────────────────
+
+- description: "single assigned task with relative deadline resolves to ISO"
+  vars:
+    today: "2026-09-08"
+    text: |
+      ok mine - im still on the mpesa callback thing, ann said she needs it by fri
+      so ill push it today or tmr. nothing else from me
+  assert:
+    - type: javascript
+      value: |
+        const { tasks } = JSON.parse(output);
+        if (tasks.length !== 1) return `expected 1 task, got ${tasks.length}`;
+        const t = tasks[0];
+        // 2026-09-08 is a Tuesday, so "fri" is the 11th.
+        if (t.dueDate !== "2026-09-11") return `dueDate ${t.dueDate}, expected 2026-09-11`;
+        if (t.deadline === null) return "raw deadline wording was dropped";
+        if (t.status !== "assigned") return `status ${t.status}, expected assigned`;
+        return true;
+
+- description: "HARD NEGATIVE — chatter containing no task at all"
+  vars:
+    today: "2026-09-08"
+    text: |
+      morning all. power was out in kikuyu till like 6am so i missed the earlier
+      call. saw the demo recording though, looked good. thats all from me
+  assert:
+    - type: javascript
+      value: |
+        const { tasks, decisions } = JSON.parse(output);
+        if (tasks.length !== 0) {
+          return `hallucinated ${tasks.length} task(s): ${tasks.map(t => t.title).join(" | ")}`;
+        }
+        if (decisions.length !== 0) return `hallucinated ${decisions.length} decision(s)`;
+        return true;
+
+- description: "blocker ownership — external dependency is not ours"
+  vars:
+    today: "2026-09-08"
+    text: |
+      blocked on my side. waiting for safaricom to whitelist our shortcode,
+      raised the ticket friday, no reply yet. cant test till they come back
+  assert:
+    - type: javascript
+      value: |
+        const { tasks } = JSON.parse(output);
+        const t = tasks[0];
+        if (!t) return "no task extracted";
+        if (t.status !== "blocked") return `status ${t.status}, expected blocked`;
+        if (t.blockerOwnedByUs !== false) return `blockerOwnedByUs ${t.blockerOwnedByUs}, expected false`;
+        return true;
+    # llm-rubric only for what code cannot check: is the blocker described faithfully?
+    # Binary and reference-anchored — the judge checks a stated fact, it does not
+    # score quality. That is the criteria-drift and verbosity-bias mitigation.
+    - type: llm-rubric
+      value: |
+        The blockerDescription field must say that the team is waiting on Safaricom
+        to whitelist the shortcode. Answer PASS if it states that. Answer FAIL if it
+        omits Safaricom, omits the whitelisting, or describes a different blocker.
+        Length, wording and style are irrelevant — do not reward detail.
+
+- description: "no deadline stated — dueDate must be null, not guessed"
+  vars:
+    today: "2026-09-08"
+    text: |
+      i need to refactor the auth middleware, been putting it off for a while.
+      no rush but its on my list
+  assert:
+    - type: javascript
+      value: |
+        const { tasks } = JSON.parse(output);
+        if (tasks.length !== 1) return `expected 1 task, got ${tasks.length}`;
+        const t = tasks[0];
+        if (t.dueDate !== null) return `dueDate ${t.dueDate}, expected null`;
+        if (t.deadline !== null) return `deadline ${t.deadline}, expected null`;
+        if (t.status !== "assigned") return `status ${t.status}, expected assigned`;
+        return true;
+
+
+
+# ── STUB — copy per case ─────────────────────────────────────────────────────
+# - description: "<one behaviour, stated as the thing that must be true>"
+#   vars:
+#     today: "2026-09-08"
+#     text: |
+#       <paste realistic messy input>
+#   assert:
+#     - type: javascript
+#       value: |
+#         const { tasks, decisions } = JSON.parse(output);
+#         // return true, or a string explaining the failure
+#         return true;

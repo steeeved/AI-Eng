@@ -1,0 +1,48 @@
+description: 1.05 standup extractor — golden set
+
+# The unit under test is extractStandup(), not a bare prompt. See provider.ts.
+providers:
+  - id: file://provider.ts
+    label: extractStandup
+
+# The provider reads vars.text; promptfoo still requires a prompt template.
+prompts:
+  - "{{text}}"
+
+tests: file://tests/golden.yaml
+
+defaultTest:
+  # ── Base of the pyramid ────────────────────────────────────────────────────
+  # These two run on EVERY case for free. They are deterministic, cost nothing,
+  # and catch the majority of real failures — shape, enums, date format. Write
+  # per-case assertions only for what these cannot see.
+  assert:
+    # Structural: valid JSON, required fields present, enums in range, no extras.
+    - type: is-json
+      value: file://schema.json
+
+    # Format: every dueDate is null or a real YYYY-MM-DD calendar date.
+    # Note it checks the date is real, not just regex-shaped: 2026-02-31 matches
+    # the pattern and is not a date.
+    - type: javascript
+      value: |
+        const { tasks } = JSON.parse(output);
+        const bad = tasks.filter((t) => {
+          if (t.dueDate === null) return false;
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(t.dueDate)) return true;
+          const d = new Date(t.dueDate + "T00:00:00Z");
+          return isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== t.dueDate;
+        });
+        return bad.length === 0
+          ? true
+          : `Non-ISO dueDate: ${bad.map((t) => `${t.id}=${t.dueDate}`).join(", ")}`;
+
+  options:
+    # Judge model for llm-rubric assertions.
+    #
+    # ⚠️ Self-preference bias: the judge is the same model family as the extractor,
+    # which is the exact setup that produced a 10–25% self-inflated win rate in
+    # MT-Bench. Mitigations applied here: rubrics are binary and reference-anchored
+    # (the judge checks a stated fact, it does not score quality), and llm-rubric is
+    # used only where determinism genuinely cannot reach. Documented in README.
+    provider: anthropic:messages:claude-haiku-4-5-20251001

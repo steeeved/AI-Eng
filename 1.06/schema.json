@@ -1,0 +1,45 @@
+{
+  "$comment": "Generated from 1.05/structured_output.ts. Regenerate with `bun run schema` after any schema change — do not hand-edit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["date", "tasks", "decisions"],
+  "properties": {
+    "date": { "type": ["string", "null"] },
+    "tasks": { "type": "array", "items": { "$ref": "#/definitions/Task" } },
+    "decisions": { "type": "array", "items": { "$ref": "#/definitions/Decision" } }
+  },
+  "definitions": {
+    "Task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "assignee",
+        "deadline",
+        "dueDate",
+        "priority",
+        "status",
+        "blockerDescription",
+        "blockerOwnedByUs"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "assignee": { "type": ["string", "null"] },
+        "deadline": { "type": ["string", "null"] },
+        "dueDate": { "type": ["string", "null"] },
+        "priority": { "enum": ["critical", "high", "medium", "low", "unknown"] },
+        "status": { "enum": ["assigned", "unassigned", "blocked", "completed", "dropped"] },
+        "blockerDescription": { "type": ["string", "null"] },
+        "blockerOwnedByUs": { "type": ["boolean", "null"] }
+      }
+    },
+    "Decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title"],
+      "properties": { "title": { "type": "string" } }
+    }
+  }
+}

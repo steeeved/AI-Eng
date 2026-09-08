@@ -1,0 +1,54 @@
+name: eval
+
+on:
+  push:
+    paths:
+      - "1.05/**"
+      - "1.06/**"
+      - ".github/workflows/eval.yml"
+  pull_request:
+    paths:
+      - "1.05/**"
+      - "1.06/**"
+  workflow_dispatch:
+
+jobs:
+  golden-set:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "1.06"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile
+
+      # Fails the job if schema.json has drifted from the Zod schema.
+      - name: schema is current
+        run: |
+          bun run schema
+          git diff --exit-code schema.json
+
+      - name: run golden set
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: bun run eval
+
+      - name: gate at 90%
+        run: bun run gate
+
+      - name: summary
+        if: always()
+        run: |
+          echo "### Eval" >> "$GITHUB_STEP_SUMMARY"
+          bun run gate >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-results
+          path: 1.06/results.json
