@@ -1,0 +1,49 @@
+[
+	{
+		"id": "invoice-basic",
+		"description": "Clean invoice email. Every field is present and labelled.",
+		"request": {
+			"fields": [
+				{ "id": "invoice_number", "label": "Invoice Number", "type": "text" },
+				{ "id": "vendor", "label": "Vendor", "type": "text" },
+				{ "id": "invoice_date", "label": "Invoice Date", "type": "date" },
+				{ "id": "due_date", "label": "Due Date", "type": "date" },
+				{ "id": "total_amount", "label": "Total", "type": "number" },
+				{ "id": "contact_email", "label": "Contact", "type": "email" },
+				{
+					"id": "status",
+					"label": "Status",
+					"type": "select",
+					"options": ["paid", "unpaid", "overdue"]
+				}
+			],
+			"source": "Riverbank Supplies Ltd\nInvoice Number: RS-2291\nVendor: Riverbank Supplies Ltd\nInvoice Date: 2026-08-14\nDue Date: 2026-09-13\n\nLine items\n  40x conduit clip           KES 4,800\n  12x junction box           KES 9,600\n  Delivery                   KES 1,200\n\nTotal: 15600\nStatus: unpaid\nContact: accounts@riverbank.co.ke\n\nPlease reference the invoice number on payment."
+		},
+		"expected": {
+			"invoice_number": "RS-2291",
+			"vendor": "Riverbank Supplies Ltd",
+			"invoice_date": "2026-08-14",
+			"due_date": "2026-09-13",
+			"total_amount": "15600",
+			"contact_email": "accounts@riverbank.co.ke",
+			"status": "unpaid"
+		}
+	},
+	{
+		"id": "invoice-unlabelled",
+		"description": "Same data, prose form, no field labels. The mock scores badly here on purpose — this is the case a real model has to win.",
+		"request": {
+			"fields": [
+				{ "id": "invoice_number", "label": "Invoice Number", "type": "text" },
+				{ "id": "total_amount", "label": "Total", "type": "number" },
+				{ "id": "contact_email", "label": "Contact", "type": "email" }
+			],
+			"source": "Hi Stephen — following up on RS-2291 from last month. We had it down as 15,600 all in, due mid-September. Anything you need from our side, drop me a line at accounts@riverbank.co.ke and I will sort it out.\n\nThanks,\nWanjiru"
+		},
+		"expected": {
+			"invoice_number": "RS-2291",
+			"total_amount": "15600",
+			"contact_email": "accounts@riverbank.co.ke"
+		}
+	}
+]
