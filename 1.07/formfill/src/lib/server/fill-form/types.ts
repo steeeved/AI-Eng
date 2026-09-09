@@ -11,9 +11,25 @@ export type ProviderResult = {
 	mock: boolean;
 };
 
+/**
+ * Per-request overrides, sourced from the browser's Settings modal (see
+ * +page.svelte) via request headers, not from server env vars. Letting a
+ * visitor bring their own credentials means this deployment's owner never
+ * has to hold everyone's keys. Any field left undefined falls back to
+ * `$lib/server/config`.
+ */
+export type ProviderCallOptions = {
+	signal?: AbortSignal;
+	anthropicApiKey?: string;
+	anthropicModel?: string;
+	langsmithApiKey?: string;
+	langsmithProject?: string;
+	langsmithTracing?: boolean;
+};
+
 export interface FillFormProvider {
 	readonly name: string;
-	fill(req: FillFormRequest): Promise<ProviderResult>;
+	fill(req: FillFormRequest, opts?: ProviderCallOptions): Promise<ProviderResult>;
 }
 
 /** Thrown by providers that exist as a seam but have no implementation yet. */
@@ -27,6 +43,17 @@ export class ProviderError extends Error {
 	constructor(
 		message: string,
 		readonly cause?: unknown
+	) {
+		super(message);
+	}
+}
+
+/** Thrown when the upstream call did not finish inside the configured deadline. Maps to a 504. */
+export class TimeoutError extends Error {
+	readonly code = 'timeout' as const;
+	constructor(
+		message: string,
+		readonly timeoutMs: number
 	) {
 		super(message);
 	}

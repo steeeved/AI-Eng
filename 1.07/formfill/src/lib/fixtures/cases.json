@@ -45,5 +45,65 @@
 			"total_amount": "15600",
 			"contact_email": "accounts@riverbank.co.ke"
 		}
+	},
+	{
+		"id": "job-application",
+		"description": "Freeform job application email — labels are conversational, not form fields, and the salary line uses a range instead of a single number.",
+		"request": {
+			"fields": [
+				{ "id": "applicant_name", "label": "Applicant Name", "type": "text" },
+				{ "id": "applicant_email", "label": "Applicant Email", "type": "email" },
+				{ "id": "position", "label": "Position Applied For", "type": "text" },
+				{ "id": "start_date", "label": "Available Start Date", "type": "date" }
+			],
+			"source": "Hi hiring team,\n\nMy name is Grace Njoroge and I'd like to apply for the Backend Engineer role you posted. I'm currently finishing a contract and could start 2026-10-01. Happy to do a call any time — best reach me at grace.njoroge@proton.me.\n\nBest,\nGrace"
+		},
+		"expected": {
+			"applicant_name": "Grace Njoroge",
+			"applicant_email": "grace.njoroge@proton.me",
+			"position": "Backend Engineer",
+			"start_date": "2026-10-01"
+		}
+	},
+	{
+		"id": "shipping-confirmation",
+		"description": "Transactional shipping email with a table-like layout — values sit two spaces after their label on the same line.",
+		"request": {
+			"fields": [
+				{ "id": "order_number", "label": "Order", "type": "text" },
+				{ "id": "carrier", "label": "Carrier", "type": "text" },
+				{ "id": "tracking_number", "label": "Tracking Number", "type": "text" },
+				{ "id": "ship_date", "label": "Ship Date", "type": "date" }
+			],
+			"source": "Your order has shipped!\n\nOrder  #ORD-88231\nCarrier  G4S Kenya\nTracking Number  GK99012345KE\nShip Date  2026-09-01\n\nEstimated delivery in 3-5 business days."
+		},
+		"expected": {
+			"order_number": "#ORD-88231",
+			"carrier": "G4S Kenya",
+			"tracking_number": "GK99012345KE",
+			"ship_date": "2026-09-01"
+		}
+	},
+	{
+		"id": "support-ticket",
+		"description": "Customer support ticket with a select field whose value only appears as a synonym ('down since yesterday' implying priority high), testing whether extraction infers rather than only pattern-matches.",
+		"request": {
+			"fields": [
+				{ "id": "customer_email", "label": "Customer Email", "type": "email" },
+				{ "id": "account_id", "label": "Account ID", "type": "text" },
+				{
+					"id": "priority",
+					"label": "Priority",
+					"type": "select",
+					"options": ["low", "medium", "high", "urgent"]
+				}
+			],
+			"source": "Ticket #4471\nFrom: ops@mombasafreight.co.ke\nAccount: MF-1042\n\nOur dashboard has been completely down since yesterday morning and we're losing visibility into every shipment in transit. This is urgent, please escalate."
+		},
+		"expected": {
+			"customer_email": "ops@mombasafreight.co.ke",
+			"account_id": "MF-1042",
+			"priority": "urgent"
+		}
 	}
 ]

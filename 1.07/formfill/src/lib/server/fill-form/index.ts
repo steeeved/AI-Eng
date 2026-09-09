@@ -1,21 +1,26 @@
-import { env } from '$env/dynamic/private';
+import { config } from '$lib/server/config';
 import { mockProvider } from './mock';
-import { openaiProvider } from './openai';
+import { anthropicProvider } from './anthropic';
 import type { FillFormProvider } from './types';
 
 const providers: Record<string, FillFormProvider> = {
 	mock: mockProvider,
-	openai: openaiProvider
+	anthropic: anthropicProvider
 };
 
 /**
- * Read per-request, not at module load: $env/dynamic/private is resolved at
- * runtime, so flipping FILL_FORM_PROVIDER in the Vercel dashboard takes effect
- * on redeploy without a code change. Unknown values fall back to the mock
- * rather than throwing — a typo in the dashboard should degrade, not 500.
+ * `override` is the request body's `provider?` field — this is what proves
+ * the abstraction per-request, with zero deploys. Falls back to
+ * FILL_FORM_PROVIDER (read at runtime via $env/dynamic/private, so flipping it
+ * in the Vercel dashboard takes effect on redeploy without a code change),
+ * then to the mock. `override` is already constrained by the Zod enum in the
+ * contract, so an unrecognised value never reaches here — only a dashboard
+ * typo in FILL_FORM_PROVIDER can, and that degrades to the mock rather than
+ * throwing a 500.
  */
-export function getProvider(): FillFormProvider {
-	return providers[env.FILL_FORM_PROVIDER ?? 'mock'] ?? mockProvider;
+export function getProvider(override?: string): FillFormProvider {
+	const name = override ?? config.FILL_FORM_PROVIDER;
+	return providers[name] ?? mockProvider;
 }
 
 export type { FillFormProvider } from './types';
