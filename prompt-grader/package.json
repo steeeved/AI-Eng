@@ -1,0 +1,19 @@
+{
+  "name": "prompt-grader",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "prompt-grader": "./cli.ts"
+  },
+  "scripts": {
+    "prompt-grader": "bun run cli.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "promptfoo": "^0.117.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

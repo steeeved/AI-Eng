@@ -21,6 +21,12 @@ const Task = z.object({
     .string()
     .nullable()
     .describe("Stated deadline, e.g. 'fri', 'next week', or null if missing"),
+  dueDate: z
+    .string()
+    .nullable()
+    .describe(
+      "The deadline normalised to an ISO 8601 calendar date (YYYY-MM-DD), resolved against the supplied today date. Null if no deadline is stated.",
+    ),
   priority: TaskPriority,
   status: TaskStatus,
   blockerDescription: z

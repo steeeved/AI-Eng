@@ -1,0 +1,4 @@
+node_modules/
+results.json
+eval-badge.json
+.promptfoo/

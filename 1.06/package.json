@@ -1,0 +1,23 @@
+{
+  "name": "eval-harness",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "schema": "bun run scripts/gen-schema.ts",
+    "eval": "set -a && . ../.env && set +a && promptfoo eval -c promptfoo.yaml -o results.json",
+    "gate": "bun run scripts/gate.ts results.json 0.9",
+    "check": "bun run eval && bun run gate",
+    "view": "promptfoo view"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.99.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "promptfoo": "^0.117.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
