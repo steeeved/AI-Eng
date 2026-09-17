@@ -33,6 +33,8 @@
 		"vite": "^8.0.16"
 	},
 	"dependencies": {
+		"@anthropic-ai/sdk": "^0.124.0",
+		"langsmith": "^0.3.0",
 		"zod": "^4.5.4"
 	}
 }
