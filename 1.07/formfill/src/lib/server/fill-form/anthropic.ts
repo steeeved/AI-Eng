@@ -7,9 +7,11 @@ import { FilledField, type FillFormRequest } from '$lib/contracts/fill-form';
 import {
 	ProviderError,
 	TimeoutError,
+	CancelledError,
 	type FillFormProvider,
 	type ProviderCallOptions,
-	type ProviderResult
+	type ProviderResult,
+	type StreamHandlers
 } from './types';
 
 /** Leaves headroom under the route's 60s `maxDuration` for our own response validation. */
@@ -86,6 +88,23 @@ function prompt(req: FillFormRequest): string {
 	].join('\n');
 }
 
+/**
+ * Tracing is genuinely optional per request: no key, no trace, no error.
+ * Shared by fill() and fillStream() so the two call paths can't silently
+ * diverge on when a visitor's own LangSmith project/key (from Settings)
+ * applies.
+ */
+function resolveTracing(opts?: ProviderCallOptions) {
+	const langsmithApiKey = opts?.langsmithApiKey ?? config.LANGSMITH_API_KEY;
+	const langsmithTracing = opts?.langsmithTracing ?? config.LANGSMITH_TRACING === 'true';
+	const tracingEnabled = langsmithTracing && Boolean(langsmithApiKey);
+	return {
+		tracingEnabled,
+		client: tracingEnabled ? new LangSmithClient({ apiKey: langsmithApiKey }) : undefined,
+		project_name: opts?.langsmithProject ?? config.LANGSMITH_PROJECT
+	};
+}
+
 export const anthropicProvider: FillFormProvider = {
 	name: 'anthropic',
 
@@ -160,7 +179,8 @@ export const anthropicProvider: FillFormProvider = {
 			return { fields, model, mock: false };
 		} catch (error) {
 			if (error instanceof ProviderError) throw error;
-			if (error instanceof Anthropic.APIConnectionTimeoutError || opts?.signal?.aborted) {
+			if (opts?.signal?.aborted) throw new CancelledError('anthropic call aborted via signal');
+			if (error instanceof Anthropic.APIConnectionTimeoutError) {
 				throw new TimeoutError(
 					`anthropic did not respond within ${DEFAULT_TIMEOUT_MS}ms`,
 					DEFAULT_TIMEOUT_MS
@@ -168,6 +188,100 @@ export const anthropicProvider: FillFormProvider = {
 			}
 			throw new ProviderError(
 				error instanceof Error ? error.message : 'unexpected anthropic failure',
+				error
+			);
+		}
+	},
+
+	/**
+	 * Real token-level streaming via the SDK's MessageStream helper (not
+	 * `stream: true` on create() + hand-rolled SSE parsing — the SDK already
+	 * accumulates deltas into a snapshot for us). `inputJson` fires as the
+	 * model's tool-call arguments arrive incrementally; each fragment is
+	 * forwarded to the route as-is via onPreview. It is NOT parsed into typed
+	 * fields here — a structurally partial JSON string is not a validated
+	 * answer, and this milestone explicitly defers progressive per-field
+	 * parsing. Only the accumulated final message, once complete, goes
+	 * through the same Zod validation `fill()` uses.
+	 */
+	async fillStream(
+		req: FillFormRequest,
+		handlers: StreamHandlers,
+		opts?: ProviderCallOptions
+	): Promise<ProviderResult> {
+		const apiKey = opts?.anthropicApiKey ?? config.ANTHROPIC_API_KEY;
+		if (!apiKey) {
+			throw new ProviderError(
+				'no Anthropic API key configured — set one in Settings, or ANTHROPIC_API_KEY on the deployment'
+			);
+		}
+		const model = opts?.anthropicModel ?? config.ANTHROPIC_MODEL;
+		const client = new Anthropic({ apiKey });
+		const tracing = resolveTracing(opts);
+
+		handlers.onProgress?.('connecting');
+
+		const stream = client.messages.stream(
+			{
+				model,
+				max_tokens: 1024,
+				tools: [EXTRACTION_TOOL],
+				tool_choice: { type: 'tool', name: 'record_extraction' },
+				messages: [{ role: 'user', content: prompt(req) }]
+			},
+			{ signal: opts?.signal, timeout: DEFAULT_TIMEOUT_MS }
+		);
+
+		let reportedGenerating = false;
+		stream.on('inputJson', (partialJson) => {
+			if (!reportedGenerating) {
+				handlers.onProgress?.('generating');
+				reportedGenerating = true;
+			}
+			handlers.onPreview?.(partialJson);
+		});
+
+		try {
+			// finalMessage() is what makes this traceable as one call — it
+			// resolves (or rejects) only once the whole stream is done, so
+			// wrapping it in `traceable` records one span for the request, not
+			// one per delta.
+			const rawFinal = () => stream.finalMessage();
+			const finalMessage = tracing.tracingEnabled
+				? traceable(rawFinal, {
+						name: 'anthropic.messages.stream',
+						client: tracing.client!,
+						project_name: tracing.project_name
+					})
+				: rawFinal;
+
+			const message = await finalMessage();
+
+			const toolUse = message.content.find(
+				(block): block is Anthropic.ToolUseBlock => block.type === 'tool_use'
+			);
+			if (!toolUse) {
+				throw new ProviderError('anthropic did not return a tool_use block');
+			}
+
+			const parsed = ExtractionResult.parse(toolUse.input);
+			const byId = new Map(parsed.fields.map((f) => [f.id, f]));
+			const fields = req.fields.map(
+				(f) => byId.get(f.id) ?? { id: f.id, value: null, confidence: 0 }
+			);
+
+			return { fields, model, mock: false };
+		} catch (error) {
+			if (error instanceof ProviderError) throw error;
+			if (opts?.signal?.aborted) throw new CancelledError('anthropic stream aborted via signal');
+			if (error instanceof Anthropic.APIConnectionTimeoutError) {
+				throw new TimeoutError(
+					`anthropic did not respond within ${DEFAULT_TIMEOUT_MS}ms`,
+					DEFAULT_TIMEOUT_MS
+				);
+			}
+			throw new ProviderError(
+				error instanceof Error ? error.message : 'unexpected anthropic stream failure',
 				error
 			);
 		}

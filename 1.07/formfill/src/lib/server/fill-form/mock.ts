@@ -1,5 +1,11 @@
 import type { FieldSpec, FillFormRequest, FilledField } from '$lib/contracts/fill-form';
-import { ProviderError, type FillFormProvider, type ProviderResult } from './types';
+import {
+	ProviderError,
+	type FillFormProvider,
+	type ProviderCallOptions,
+	type ProviderResult,
+	type StreamHandlers
+} from './types';
 
 /**
  * Deterministic label-scanning extractor. This is not clever and is not meant
@@ -67,6 +73,30 @@ function byShape(source: string, field: FieldSpec): FilledField | null {
 	return hit ? { id: field.id, value: hit, confidence: 0.3 } : null;
 }
 
+function extractFields(req: FillFormRequest): FilledField[] {
+	return req.fields.map(
+		(field) =>
+			byLabel(req.source, field) ??
+			byShape(req.source, field) ?? { id: field.id, value: null, confidence: 0 }
+	);
+}
+
+/** Aborts the wait early and rejects, mirroring what a real cancelled upstream call does. */
+function abortableDelay(ms: number, signal?: AbortSignal): Promise<void> {
+	if (signal?.aborted) return Promise.reject(new DOMException('aborted', 'AbortError'));
+	return new Promise((resolve, reject) => {
+		const timer = setTimeout(resolve, ms);
+		signal?.addEventListener(
+			'abort',
+			() => {
+				clearTimeout(timer);
+				reject(new DOMException('aborted', 'AbortError'));
+			},
+			{ once: true }
+		);
+	});
+}
+
 export const mockProvider: FillFormProvider = {
 	name: 'mock',
 
@@ -79,12 +109,35 @@ export const mockProvider: FillFormProvider = {
 		// Deterministic, roughly model-shaped latency — enough to see the spinner.
 		await new Promise((resolve) => setTimeout(resolve, 120 + req.fields.length * 40));
 
-		const fields = req.fields.map(
-			(field) =>
-				byLabel(req.source, field) ??
-				byShape(req.source, field) ?? { id: field.id, value: null, confidence: 0 }
-		);
+		return { fields: extractFields(req), model: 'mock-scanner-v1', mock: true };
+	},
 
-		return { fields, model: 'mock-scanner-v1', mock: true };
+	/**
+	 * The mock has no tokens to stream, so it fakes the lifecycle instead:
+	 * one 'connecting' tick, then one 'generating'/'preview' tick per field —
+	 * enough ticks to prove the UI's progressive-state handling and, more
+	 * importantly, its cancellation path (mid-stream Stop) without spending
+	 * an Anthropic call on every manual test.
+	 */
+	async fillStream(
+		req: FillFormRequest,
+		handlers: StreamHandlers,
+		opts?: ProviderCallOptions
+	): Promise<ProviderResult> {
+		if (req.source.includes('__fail')) {
+			throw new ProviderError('mock provider asked to fail via __fail sentinel');
+		}
+
+		handlers.onProgress?.('connecting');
+		await abortableDelay(80, opts?.signal);
+
+		const perFieldMs = 60;
+		for (let i = 0; i < req.fields.length; i++) {
+			handlers.onProgress?.('generating');
+			handlers.onPreview?.(`{"fields":[${'…,'.repeat(i)}"${req.fields[i].id}"?]}`);
+			await abortableDelay(perFieldMs, opts?.signal);
+		}
+
+		return { fields: extractFields(req), model: 'mock-scanner-v1', mock: true };
 	}
 };
