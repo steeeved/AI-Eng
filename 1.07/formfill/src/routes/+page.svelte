@@ -8,6 +8,7 @@
 	import { Textarea } from '$lib/components/ui/textarea';
 	import rawCases from '$lib/fixtures/cases.json';
 	import type { FieldSpec, FieldType, FillFormResponse, FillFormStreamEvent } from '$lib/contracts/fill-form';
+	import { FillFormStreamEvent as FillFormStreamEventSchema } from '$lib/contracts/fill-form';
 
 	type EvalCase = {
 		id: string;
@@ -70,6 +71,8 @@
 	 */
 	let generation = 0;
 	let activeAbort: AbortController | null = null;
+	/** Latch: after the first terminal event, ignore everything else in this stream. */
+	let terminalSeen = false;
 	/** The deployment's fallback provider, read once from GET /api/fill-form. */
 	let defaultProvider = $state('checking…');
 	/** '' means "use the deployment default" — omitted from the request body entirely. */
@@ -125,6 +128,12 @@
 	}
 
 	function loadCase(evalCase: EvalCase) {
+		// Abort any in-flight request so its late events cannot overwrite
+		// the newly loaded case. Increment generation so the old submit()'s
+		// isCurrent() check fails even if the abort hasn't fired yet.
+		activeAbort?.abort();
+		++generation;
+
 		fields = structuredClone(evalCase.request.fields);
 		source = evalCase.request.source;
 		result = null;
@@ -167,10 +176,15 @@
 			const line = part.split('\n').find((l) => l.startsWith('data: '));
 			if (!line) continue;
 			try {
-				events.push(JSON.parse(line.slice('data: '.length)) as FillFormStreamEvent);
+				const raw = JSON.parse(line.slice('data: '.length));
+				const parsed = FillFormStreamEventSchema.safeParse(raw);
+				if (parsed.success) {
+					events.push(parsed.data);
+				}
+				// Malformed payloads are silently dropped — they are a bug
+				// in the route, not something to crash the tab over.
 			} catch {
-				// A frame that isn't valid JSON is a bug in the route, not
-				// something to crash the tab over — drop it and keep reading.
+				// A frame that isn't valid JSON is dropped.
 			}
 		}
 		return { events, rest };
@@ -192,6 +206,7 @@
 		preview = '';
 		result = null;
 		fillError = null;
+		terminalSeen = false;
 
 		const isCurrent = () => myGeneration === generation;
 
@@ -241,6 +256,7 @@
 
 				for (const event of events) {
 					if (!isCurrent()) return;
+					if (terminalSeen) continue;
 					switch (event.type) {
 						case 'progress':
 							progressStage = event.stage;
@@ -251,13 +267,16 @@
 						case 'result':
 							result = event.data;
 							phase = 'complete';
+							terminalSeen = true;
 							break;
 						case 'error':
 							fillError = { title: event.problem.title, detail: event.problem.detail };
 							phase = 'failed';
+							terminalSeen = true;
 							break;
 						case 'cancelled':
 							phase = 'cancelled';
+							terminalSeen = true;
 							break;
 					}
 				}

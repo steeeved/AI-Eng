@@ -105,16 +105,25 @@ export const POST: RequestHandler = async ({ request, url }) => {
 	const startedAt = Date.now();
 	const provider = getProvider(parsed.data.provider);
 
-	// Two independent reasons the stream can be cut short, tracked as two
-	// separate AbortControllers so the catch block below can tell them apart
-	// afterwards — `clientSignal.aborted` means the visitor cancelled or
-	// disconnected; `routeTimeoutController.signal.aborted` means our own
-	// backstop fired. Providers only ever see the merged signal; they don't
-	// need to know which caller is responsible, only that they must stop.
+	// Three independent reasons the stream can be cut short, tracked as
+	// separate AbortControllers so the catch block below can tell them
+	// apart afterwards:
+	//   - `clientSignal.aborted` means the visitor cancelled or disconnected
+	//   - `routeTimeoutController.signal.aborted` means our own backstop fired
+	//   - `disconnectController.signal.aborted` means the response consumer
+	//     called cancel() — in some runtimes request.signal does not fire
+	//     when the reader is cancelled, so we need an explicit signal.
+	// Providers only ever see the merged signal; they don't need to know
+	// which caller is responsible, only that they must stop.
 	const routeTimeoutController = new AbortController();
 	const timeout = setTimeout(() => routeTimeoutController.abort(), ROUTE_TIMEOUT_MS);
 	const clientSignal = request.signal;
-	const combinedSignal = AbortSignal.any([routeTimeoutController.signal, clientSignal]);
+	const disconnectController = new AbortController();
+	const combinedSignal = AbortSignal.any([
+		routeTimeoutController.signal,
+		clientSignal,
+		disconnectController.signal
+	]);
 	const opts: ProviderCallOptions = { ...clientOverrides, signal: combinedSignal };
 
 	const stream = new ReadableStream<Uint8Array>({
@@ -235,9 +244,10 @@ export const POST: RequestHandler = async ({ request, url }) => {
 		},
 		cancel() {
 			// Fires when the client calls reader.cancel() (our Stop button) or
-			// disconnects. clientSignal is the same request.signal already
-			// threaded into `opts`, so the in-flight provider call sees the
-			// abort on its own — nothing extra to propagate here.
+			// disconnects. We explicitly abort the disconnect controller so
+			// the provider sees the signal even in runtimes where
+			// request.signal does not fire on response cancellation.
+			disconnectController.abort();
 			clearTimeout(timeout);
 		}
 	});
