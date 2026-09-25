@@ -1,19 +1,11 @@
 import { json } from '@sveltejs/kit';
+import { traceable } from 'langsmith/traceable';
+import { Client as LangSmithClient } from 'langsmith';
 import type { RequestHandler } from './$types';
-import {
-	FillFormRequest,
-	FillFormResponse,
-	type FillFormStreamEvent,
-	type ProblemDetails
-} from '$lib/contracts/fill-form';
-import { getProvider, streamProvider } from '$lib/server/fill-form';
+import { FillFormRequest, FillFormResponse, type ProblemDetails } from '$lib/contracts/fill-form';
+import { getProvider } from '$lib/server/fill-form';
 import { config as appConfig } from '$lib/server/config';
-import {
-	CancelledError,
-	NotImplementedError,
-	ProviderError,
-	TimeoutError
-} from '$lib/server/fill-form/types';
+import { NotImplementedError, ProviderError, TimeoutError } from '$lib/server/fill-form/types';
 import type { ProviderCallOptions } from '$lib/server/fill-form/types';
 
 // Without this SvelteKit will try to prerender the endpoint if anything
@@ -56,28 +48,20 @@ export const GET: RequestHandler = async () => {
 	return json({ ok: true, provider: provider.name });
 };
 
-const encoder = new TextEncoder();
-
-/**
- * One SSE `data:` frame per event, exactly as the contract's
- * FillFormStreamEvent union defines it. This is hand-rolled rather than
- * pulled from a library because the format is three lines: a JSON-encoded
- * payload, a blank line, done. `fetch` reads a POST response body as a
- * stream just fine — native `EventSource` is GET-only and can't carry the
- * request body this route needs, which is why the client reads this with
- * `response.body.getReader()` instead of `new EventSource(...)`.
- */
-function sseFrame(event: FillFormStreamEvent): Uint8Array {
-	return encoder.encode(`data: ${JSON.stringify(event)}\n\n`);
+async function runFillFormRaw(input: {
+	data: ReturnType<typeof FillFormRequest.parse>;
+	opts: ProviderCallOptions;
+}) {
+	const provider = getProvider(input.data.provider);
+	const startedAt = Date.now();
+	const result = await provider.fill(input.data, input.opts);
+	return { result, provider: provider.name, latencyMs: Date.now() - startedAt };
 }
 
 export const POST: RequestHandler = async ({ request, url }) => {
 	const instance = url.pathname;
 	const clientOverrides = readClientOverrides(request);
 
-	// Body parsing and contract validation still happen before the stream
-	// opens — a malformed request should get one plain JSON problem response
-	// and never cost a provider call, exactly as before 1.09.
 	let raw: unknown;
 	try {
 		raw = await request.json();
@@ -102,163 +86,84 @@ export const POST: RequestHandler = async ({ request, url }) => {
 		});
 	}
 
-	const startedAt = Date.now();
-	const provider = getProvider(parsed.data.provider);
+	const controller = new AbortController();
+	const timeout = setTimeout(() => controller.abort(), ROUTE_TIMEOUT_MS);
+	const opts: ProviderCallOptions = { ...clientOverrides, signal: controller.signal };
 
-	// Three independent reasons the stream can be cut short, tracked as
-	// separate AbortControllers so the catch block below can tell them
-	// apart afterwards:
-	//   - `clientSignal.aborted` means the visitor cancelled or disconnected
-	//   - `routeTimeoutController.signal.aborted` means our own backstop fired
-	//   - `disconnectController.signal.aborted` means the response consumer
-	//     called cancel() — in some runtimes request.signal does not fire
-	//     when the reader is cancelled, so we need an explicit signal.
-	// Providers only ever see the merged signal; they don't need to know
-	// which caller is responsible, only that they must stop.
-	const routeTimeoutController = new AbortController();
-	const timeout = setTimeout(() => routeTimeoutController.abort(), ROUTE_TIMEOUT_MS);
-	const clientSignal = request.signal;
-	const disconnectController = new AbortController();
-	const combinedSignal = AbortSignal.any([
-		routeTimeoutController.signal,
-		clientSignal,
-		disconnectController.signal
-	]);
-	const opts: ProviderCallOptions = { ...clientOverrides, signal: combinedSignal };
+	// Same "trace any code" pattern as the anthropic provider: built fresh per
+	// request so a visitor's own LangSmith project/key (from Settings) is what
+	// this request's top-level span lands in, not necessarily the deployment's.
+	const langsmithApiKey = clientOverrides.langsmithApiKey ?? appConfig.LANGSMITH_API_KEY;
+	const langsmithTracing = clientOverrides.langsmithTracing ?? appConfig.LANGSMITH_TRACING === 'true';
+	const tracingEnabled = langsmithTracing && Boolean(langsmithApiKey);
 
-	const stream = new ReadableStream<Uint8Array>({
-		async start(controller) {
-			const send = (event: FillFormStreamEvent) => controller.enqueue(sseFrame(event));
+	const runFillForm = tracingEnabled
+		? traceable(runFillFormRaw, {
+				name: 'fill-form',
+				client: new LangSmithClient({ apiKey: langsmithApiKey }),
+				project_name: clientOverrides.langsmithProject ?? appConfig.LANGSMITH_PROJECT
+			})
+		: runFillFormRaw;
 
-			try {
-				const result = await streamProvider(
-					provider,
-					parsed.data,
-					{
-						onProgress: (stage) =>
-							send({ type: 'progress', stage, elapsedMs: Date.now() - startedAt }),
-						onPreview: (partial) => send({ type: 'preview', partial })
-					},
-					opts
-				);
+	try {
+		const timedOut = new Promise<never>((_, reject) => {
+			controller.signal.addEventListener('abort', () =>
+				reject(new TimeoutError(`request exceeded ${ROUTE_TIMEOUT_MS}ms`, ROUTE_TIMEOUT_MS))
+			);
+		});
 
-				// Validate our own output, not just the input. On the day a
-				// provider's behaviour drifts, this is what catches it loudly,
-				// here — instead of silently rendering blanks in the UI. A
-				// contract failure is a terminal `error` event, never a thrown
-				// 500 the client can't see once headers are already sent.
-				const payload = FillFormResponse.safeParse({
-					fields: result.fields,
-					meta: {
-						mock: result.mock,
-						model: result.model,
-						provider: provider.name,
-						latencyMs: Date.now() - startedAt
-					}
-				});
+		const { result, provider, latencyMs } = await Promise.race([
+			runFillForm({ data: parsed.data, opts }),
+			timedOut
+		]);
 
-				if (!payload.success) {
-					console.error('[fill-form] response failed its own contract', payload.error.issues);
-					send({
-						type: 'error',
-						problem: {
-							type: 'https://formfill.dev/problems/provider-error',
-							title: 'Provider returned a response that does not match the contract',
-							status: 502,
-							instance,
-							provider: provider.name
-						}
-					});
-				} else {
-					send({ type: 'result', data: payload.data });
-				}
-			} catch (error) {
-				if (clientSignal.aborted) {
-					// The visitor's own AbortController firing is already
-					// authoritative on the client — this event lets the UI
-					// confirm the SERVER stopped too, not just the local fetch.
-					send({ type: 'cancelled' });
-				} else if (routeTimeoutController.signal.aborted) {
-					send({
-						type: 'error',
-						problem: {
-							type: 'https://formfill.dev/problems/timeout',
-							title: 'Upstream provider did not respond in time',
-							status: 504,
-							instance,
-							timeoutMs: ROUTE_TIMEOUT_MS
-						}
-					});
-				} else if (error instanceof CancelledError) {
-					send({ type: 'cancelled' });
-				} else if (error instanceof NotImplementedError) {
-					send({
-						type: 'error',
-						problem: {
-							type: 'https://formfill.dev/problems/not-implemented',
-							title: 'Provider is not implemented yet',
-							status: 501,
-							instance,
-							detail: error.message
-						}
-					});
-				} else if (error instanceof TimeoutError) {
-					send({
-						type: 'error',
-						problem: {
-							type: 'https://formfill.dev/problems/timeout',
-							title: 'Upstream provider did not respond in time',
-							status: 504,
-							instance,
-							detail: error.message,
-							timeoutMs: error.timeoutMs
-						}
-					});
-				} else if (error instanceof ProviderError) {
-					send({
-						type: 'error',
-						problem: {
-							type: 'https://formfill.dev/problems/provider-error',
-							title: 'Upstream provider failed',
-							status: 502,
-							instance,
-							detail: error.message
-						}
-					});
-				} else {
-					console.error('[fill-form] unexpected failure', error);
-					send({
-						type: 'error',
-						problem: {
-							type: 'https://formfill.dev/problems/provider-error',
-							title: 'Unexpected provider failure',
-							status: 502,
-							instance
-						}
-					});
-				}
-			} finally {
-				clearTimeout(timeout);
-				controller.close();
-			}
-		},
-		cancel() {
-			// Fires when the client calls reader.cancel() (our Stop button) or
-			// disconnects. We explicitly abort the disconnect controller so
-			// the provider sees the signal even in runtimes where
-			// request.signal does not fire on response cancellation.
-			disconnectController.abort();
-			clearTimeout(timeout);
+		// Validate our own output, not just the input. On the day a provider's
+		// behaviour drifts, this is what catches it loudly, here — instead of
+		// silently rendering blanks in the UI.
+		const payload = FillFormResponse.safeParse({
+			fields: result.fields,
+			meta: { mock: result.mock, model: result.model, provider, latencyMs }
+		});
+
+		if (!payload.success) {
+			console.error('[fill-form] response failed its own contract', payload.error.issues);
+			return problem(instance, 502, {
+				type: 'https://formfill.dev/problems/provider-error',
+				title: 'Provider returned a response that does not match the contract',
+				provider
+			});
 		}
-	});
 
-	return new Response(stream, {
-		status: 200,
-		headers: {
-			'content-type': 'text/event-stream',
-			'cache-control': 'no-cache',
-			connection: 'keep-alive',
-			'x-accel-buffering': 'no'
+		return json(payload.data);
+	} catch (error) {
+		if (error instanceof NotImplementedError) {
+			return problem(instance, 501, {
+				type: 'https://formfill.dev/problems/not-implemented',
+				title: 'Provider is not implemented yet',
+				detail: error.message
+			});
 		}
-	});
+		if (error instanceof TimeoutError) {
+			return problem(instance, 504, {
+				type: 'https://formfill.dev/problems/timeout',
+				title: 'Upstream provider did not respond in time',
+				detail: error.message,
+				timeoutMs: error.timeoutMs
+			});
+		}
+		if (error instanceof ProviderError) {
+			return problem(instance, 502, {
+				type: 'https://formfill.dev/problems/provider-error',
+				title: 'Upstream provider failed',
+				detail: error.message
+			});
+		}
+		console.error('[fill-form] unexpected failure', error);
+		return problem(instance, 502, {
+			type: 'https://formfill.dev/problems/provider-error',
+			title: 'Unexpected provider failure'
+		});
+	} finally {
+		clearTimeout(timeout);
+	}
 };
