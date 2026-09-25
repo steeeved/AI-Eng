@@ -1,7 +1,8 @@
+import type { FillFormRequest } from '$lib/contracts/fill-form';
 import { config } from '$lib/server/config';
 import { mockProvider } from './mock';
 import { anthropicProvider } from './anthropic';
-import type { FillFormProvider } from './types';
+import type { FillFormProvider, ProviderCallOptions, ProviderResult, StreamHandlers } from './types';
 
 const providers: Record<string, FillFormProvider> = {
 	mock: mockProvider,
@@ -21,6 +22,28 @@ const providers: Record<string, FillFormProvider> = {
 export function getProvider(override?: string): FillFormProvider {
 	const name = override ?? config.FILL_FORM_PROVIDER;
 	return providers[name] ?? mockProvider;
+}
+
+/**
+ * Every caller of a provider's streaming path goes through here, never
+ * provider.fillStream directly. A provider that hasn't implemented
+ * fillStream still behaves correctly under 1.09 — it just can't report real
+ * mid-flight progress, only a single 'connecting' -> 'generating' -> done.
+ * This is what let 1.09 ship against both providers without the mock
+ * needing token-level streaming to prove out first.
+ */
+export async function streamProvider(
+	provider: FillFormProvider,
+	req: FillFormRequest,
+	handlers: StreamHandlers,
+	opts?: ProviderCallOptions
+): Promise<ProviderResult> {
+	if (provider.fillStream) {
+		return provider.fillStream(req, handlers, opts);
+	}
+	handlers.onProgress?.('connecting');
+	handlers.onProgress?.('generating');
+	return provider.fill(req, opts);
 }
 
 export type { FillFormProvider } from './types';

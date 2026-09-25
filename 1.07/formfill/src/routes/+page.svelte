@@ -7,7 +7,8 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Textarea } from '$lib/components/ui/textarea';
 	import rawCases from '$lib/fixtures/cases.json';
-	import type { FieldSpec, FieldType, FillFormResponse } from '$lib/contracts/fill-form';
+	import type { FieldSpec, FieldType, FillFormResponse, FillFormStreamEvent } from '$lib/contracts/fill-form';
+	import { FillFormStreamEvent as FillFormStreamEventSchema } from '$lib/contracts/fill-form';
 
 	type EvalCase = {
 		id: string;
@@ -39,8 +40,39 @@
 
 	let fields = $state<FieldSpec[]>(structuredClone(cases[0].request.fields));
 	let source = $state(cases[0].request.source);
+
+	/**
+	 * The full 1.09 lifecycle. 'working' covers both 'connecting' and
+	 * 'generating' progress sub-stages (see progressStage) — those are a
+	 * detail for the status line, not a separate top-level state, since
+	 * every UI decision (show Stop? show spinner?) is the same for both.
+	 */
+	type FillPhase = 'idle' | 'working' | 'complete' | 'cancelled' | 'failed';
+	type FillError = { title: string; detail?: string };
+
 	let result = $state<FillFormResponse | null>(null);
-	let loading = $state(false);
+	let phase = $state<FillPhase>('idle');
+	let progressStage = $state<'connecting' | 'generating' | null>(null);
+	/**
+	 * Raw partial provider output while phase === 'working'. Provisional and
+	 * read-only: a structurally complete JSON fragment is not a validated
+	 * answer, so this is only ever displayed as a "still working" indicator,
+	 * never parsed into a field value. See StreamPreviewEvent.
+	 */
+	let preview = $state('');
+	let fillError = $state<FillError | null>(null);
+	let loading = $derived(phase === 'working');
+
+	/**
+	 * Bumped on every submit(). A stream event whose generation doesn't match
+	 * the current one is from a superseded request (e.g. the user hit Stop
+	 * and immediately clicked Fill again) and must be ignored, even if the
+	 * old reader is still delivering buffered chunks.
+	 */
+	let generation = 0;
+	let activeAbort: AbortController | null = null;
+	/** Latch: after the first terminal event, ignore everything else in this stream. */
+	let terminalSeen = false;
 	/** The deployment's fallback provider, read once from GET /api/fill-form. */
 	let defaultProvider = $state('checking…');
 	/** '' means "use the deployment default" — omitted from the request body entirely. */
@@ -96,9 +128,18 @@
 	}
 
 	function loadCase(evalCase: EvalCase) {
+		// Abort any in-flight request so its late events cannot overwrite
+		// the newly loaded case. Increment generation so the old submit()'s
+		// isCurrent() check fails even if the abort hasn't fired yet.
+		activeAbort?.abort();
+		++generation;
+
 		fields = structuredClone(evalCase.request.fields);
 		source = evalCase.request.source;
 		result = null;
+		phase = 'idle';
+		preview = '';
+		fillError = null;
 	}
 
 	function addField() {
@@ -122,9 +163,53 @@
 		return headers;
 	}
 
-	async function fill() {
-		loading = true;
+	/**
+	 * Parses the SSE body one chunk at a time. `data: <json>\n\n` frames can
+	 * arrive split across chunk boundaries (TCP doesn't respect our framing),
+	 * so incomplete text is held in `buffer` until a full `\n\n` shows up.
+	 */
+	function parseSseFrames(buffer: string): { events: FillFormStreamEvent[]; rest: string } {
+		const events: FillFormStreamEvent[] = [];
+		const parts = buffer.split('\n\n');
+		const rest = parts.pop() ?? '';
+		for (const part of parts) {
+			const line = part.split('\n').find((l) => l.startsWith('data: '));
+			if (!line) continue;
+			try {
+				const raw = JSON.parse(line.slice('data: '.length));
+				const parsed = FillFormStreamEventSchema.safeParse(raw);
+				if (parsed.success) {
+					events.push(parsed.data);
+				}
+				// Malformed payloads are silently dropped — they are a bug
+				// in the route, not something to crash the tab over.
+			} catch {
+				// A frame that isn't valid JSON is dropped.
+			}
+		}
+		return { events, rest };
+	}
+
+	/** Wired to the Stop button. Cancellation cannot undo work already performed upstream — see 1.09. */
+	function stop() {
+		activeAbort?.abort();
+	}
+
+	async function submit() {
+		const myGeneration = ++generation;
+		activeAbort?.abort(); // a stray earlier run, if any, should not keep running
+		const controller = new AbortController();
+		activeAbort = controller;
+
+		phase = 'working';
+		progressStage = 'connecting';
+		preview = '';
 		result = null;
+		fillError = null;
+		terminalSeen = false;
+
+		const isCurrent = () => myGeneration === generation;
+
 		try {
 			const res = await fetch('/api/fill-form', {
 				method: 'POST',
@@ -134,23 +219,87 @@
 					fields: $state.snapshot(fields),
 					source,
 					...(selectedProvider ? { provider: selectedProvider } : {})
-				})
+				}),
+				signal: controller.signal
 			});
-			const body = await res.json();
 
-			if (!res.ok) {
-				toast.error(body.title ?? body.message ?? `request failed (${res.status})`, {
-					description:
+			if (!res.ok || !res.body) {
+				// Only pre-stream failures (bad JSON, contract validation) still
+				// come back as a plain problem+json response — everything past
+				// that point is an 'error' event inside the stream instead.
+				const body = await res.json().catch(() => ({}));
+				if (!isCurrent()) return;
+				phase = 'failed';
+				fillError = {
+					title: body.title ?? body.message ?? `request failed (${res.status})`,
+					detail:
 						body.detail ??
-						body.errors?.map((i: { path: string; message: string }) => `${i.path}: ${i.message}`).join('\n')
-				});
+						body.errors
+							?.map((i: { path: string; message: string }) => `${i.path}: ${i.message}`)
+							.join('\n')
+				};
 				return;
 			}
-			result = body as FillFormResponse;
+
+			const reader = res.body.getReader();
+			const decoder = new TextDecoder();
+			let buffer = '';
+
+			while (true) {
+				const { done, value } = await reader.read();
+				if (!isCurrent()) return; // superseded mid-read — stop applying its events entirely
+				if (done) break;
+
+				buffer += decoder.decode(value, { stream: true });
+				const { events, rest } = parseSseFrames(buffer);
+				buffer = rest;
+
+				for (const event of events) {
+					if (!isCurrent()) return;
+					if (terminalSeen) continue;
+					switch (event.type) {
+						case 'progress':
+							progressStage = event.stage;
+							break;
+						case 'preview':
+							preview = event.partial;
+							break;
+						case 'result':
+							result = event.data;
+							phase = 'complete';
+							terminalSeen = true;
+							break;
+						case 'error':
+							fillError = { title: event.problem.title, detail: event.problem.detail };
+							phase = 'failed';
+							terminalSeen = true;
+							break;
+						case 'cancelled':
+							phase = 'cancelled';
+							terminalSeen = true;
+							break;
+					}
+				}
+			}
+
+			// The stream closed without ever sending a terminal event — a
+			// dropped connection or a stalled upstream, not a clean finish.
+			// Do NOT leave phase at 'working' forever, and do not treat a
+			// silent close as success.
+			if (isCurrent() && phase === 'working') {
+				phase = 'failed';
+				fillError = { title: 'Connection ended before a result arrived', detail: 'stream closed with no terminal event' };
+			}
 		} catch (error) {
-			toast.error('network error', { description: String(error) });
+			if (!isCurrent()) return;
+			if (controller.signal.aborted) {
+				phase = 'cancelled';
+			} else {
+				phase = 'failed';
+				fillError = { title: 'network error', detail: String(error) };
+			}
 		} finally {
-			loading = false;
+			if (activeAbort === controller) activeAbort = null;
 		}
 	}
 </script>
@@ -235,15 +384,62 @@
 				{/each}
 				<Button variant="outline" size="sm" onclick={addField}>Add field</Button>
 			</Card.Content>
-			<Card.Footer>
-				<Button onclick={fill} disabled={loading || fields.length === 0} class="w-full">
-					{loading ? 'Filling…' : 'Fill form'}
+			<Card.Footer class="gap-2">
+				<Button onclick={submit} disabled={loading || fields.length === 0} class="flex-1">
+					{loading ? (progressStage === 'connecting' ? 'Connecting…' : 'Filling…') : 'Fill form'}
 				</Button>
+				{#if loading}
+					<Button variant="destructive" onclick={stop}>Stop</Button>
+				{/if}
 			</Card.Footer>
 		</Card.Root>
 	</div>
 
-	{#if result}
+	{#if phase === 'working'}
+		<Card.Root>
+			<Card.Header>
+				<Card.Title class="flex items-center gap-2">
+					<span class="bg-foreground inline-block h-2 w-2 animate-pulse rounded-full"></span>
+					{progressStage === 'connecting' ? 'Connecting…' : 'Generating…'}
+				</Card.Title>
+				<Card.Description>
+					Provisional output only — not yet validated, may still change or fail.
+				</Card.Description>
+			</Card.Header>
+			{#if preview}
+				<Card.Content>
+					<pre class="bg-muted overflow-x-auto rounded-md p-3 text-xs">{preview}</pre>
+				</Card.Content>
+			{/if}
+		</Card.Root>
+	{:else if phase === 'cancelled'}
+		<Card.Root>
+			<Card.Header>
+				<Card.Title>Cancelled</Card.Title>
+				<Card.Description>
+					Stopped by you. Work already performed upstream cannot be undone — this only stops
+					waiting on more of it.
+				</Card.Description>
+			</Card.Header>
+			<Card.Footer>
+				<Button variant="outline" size="sm" onclick={submit}>Try again</Button>
+			</Card.Footer>
+		</Card.Root>
+	{:else if phase === 'failed'}
+		<Card.Root>
+			<Card.Header>
+				<Card.Title class="text-destructive">{fillError?.title ?? 'Failed'}</Card.Title>
+				{#if fillError?.detail}
+					<Card.Description>{fillError.detail}</Card.Description>
+				{/if}
+			</Card.Header>
+			<Card.Footer>
+				<!-- Explicit retry only — 1.09 is clear that a request which may
+				     still be running upstream must never be auto-replayed. -->
+				<Button variant="outline" size="sm" onclick={submit}>Retry</Button>
+			</Card.Footer>
+		</Card.Root>
+	{:else if phase === 'complete' && result}
 		<Card.Root>
 			<Card.Header>
 				<Card.Title>Result</Card.Title>
