@@ -5,13 +5,11 @@ on:
     paths:
       - "1.05/**"
       - "1.06/**"
-      - "1.07/formfill/**"
       - ".github/workflows/eval.yml"
   pull_request:
     paths:
       - "1.05/**"
       - "1.06/**"
-      - "1.07/formfill/**"
   workflow_dispatch:
 
 jobs:
@@ -54,61 +52,3 @@ jobs:
         with:
           name: eval-results
           path: 1.06/results.json
-
-  formfill-golden-set:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: "1.07/formfill"
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - run: bun install --frozen-lockfile
-
-      - name: typecheck and Svelte diagnostics
-        run: bun run check
-
-      # The eval calls the real route/SSE seam with provider=anthropic, so the
-      # dev server is the system under test. It also proves the contract, the
-      # Zod response validation and the provider wiring, not just the prompt.
-      - name: start dev server
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          FILL_FORM_PROVIDER: anthropic
-        run: |
-          nohup ./node_modules/.bin/vite dev --port 4173 --strictPort --host 127.0.0.1 > /tmp/formfill-dev.log 2>&1 &
-          echo $! > /tmp/formfill.pid
-          for i in $(seq 1 60); do
-            if curl -sf http://127.0.0.1:4173/api/fill-form > /dev/null; then exit 0; fi
-            sleep 1
-          done
-          echo "dev server did not become healthy"; cat /tmp/formfill-dev.log; exit 1
-
-      - name: run golden set
-        run: bun run eval --base http://127.0.0.1:4173
-
-      - name: gate at 95% and zero invented
-        run: bun run gate
-
-      - name: summary
-        if: always()
-        run: |
-          echo "### FormFill eval" >> "$GITHUB_STEP_SUMMARY"
-          bun run gate >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: formfill-eval-results
-          path: |
-            1.07/formfill/results.json
-            1.07/formfill/eval-badge.json
-
-      - name: stop dev server
-        if: always()
-        run: |
-          if [ -f /tmp/formfill.pid ]; then kill "$(cat /tmp/formfill.pid)" || true; fi

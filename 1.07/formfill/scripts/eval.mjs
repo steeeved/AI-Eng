@@ -195,7 +195,7 @@ async function runWithRetry(testCase) {
 			// Contract/validation failures are deterministic; retrying them only
 			// wastes a provider call. Transport and provider errors may be flaky.
 			const message = error instanceof Error ? error.message : String(error);
-			const retryable = !/HTTP 4\d\d|authentication_error|invalid x-api-key/.test(message);
+			const retryable = !/HTTP 4\d\d|authentication_error|invalid x-api-key|no Anthropic API key/.test(message);
 			if (i === attempts || !retryable) break;
 			console.warn(`  retry ${i}/${attempts} — ${message}`);
 			await sleep(1500 * i);
