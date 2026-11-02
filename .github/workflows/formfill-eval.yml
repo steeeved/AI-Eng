@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  golden-set:
+  formfill-golden-set:
     runs-on: ubuntu-latest
     defaults:
       run:
