@@ -1,5 +1,7 @@
 # FormFill
 
+![FormFill eval](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsteeeved%2FAI-Eng%2Fmain%2F1.07%2Fformfill%2Feval-badge.json)
+
 Extracts structured fields from unstructured text — give it a field schema
 (id, label, type) and a blob of source text, and it returns each field's
 value with a confidence score. Built mock-first: the API contract, the error
@@ -14,10 +16,9 @@ same interface; see [Swapping in / calling the real provider](#swapping-in--call
 `src/routes/+page.svelte` is a single-page UI:
 
 - **Source** (left card) — the unstructured text to extract from. Buttons
-  above it load one of the five fixture cases from
-  `src/lib/fixtures/cases.json` (invoices, a job application, a shipping
-  confirmation, a support ticket), or append the `__fail` sentinel to force
-  the 502 path (**break it**).
+  above it load one of the golden-set cases from
+  `src/lib/fixtures/cases.json` (invoices, receipts, threads, CVs, Kenyan-English
+  email), or append the `__fail` sentinel to force the 502 path (**break it**).
 - **Fields** (right card) — the schema you want back: an `id` (snake_case),
   a `label` the extractor searches for, and a `type` (`text`, `email`,
   `number`, `date`, `select`). Add or remove rows freely.
@@ -71,6 +72,39 @@ bun run smoke https://<deployment>.vercel.app
 EXPECT_REAL=1 bun run smoke https://<deployment>.vercel.app   # fails if prod is still mocked
 ```
 
+## Evaluation
+
+`src/lib/fixtures/cases.json` is both the UI's example data and the golden set:
+30 cases split into a **tuning** set and a **held-out** set that is never tuned
+against. The eval hits the real `/api/fill-form` route with
+`provider: "anthropic"` — so the prompt, schema, validation and provider wiring
+are all under test, not a copied prompt.
+
+```bash
+bun run dev                                   # in another terminal
+bun run eval                                  # writes results.json
+bun run gate                                  # 95% tuning + zero invented
+```
+
+The gate has two independent thresholds:
+
+| Gate | Threshold |
+| --- | --- |
+| Tuning field accuracy | ≥ 95% |
+| Invented values for absent fields | 0 |
+
+A run at 99% with one invented value fails. An invented value — a plausible
+answer for a field the source never contained — is a different error class from
+a miss: a clerk can fill a blank, but nobody catches a confident wrong number.
+It is never averaged into the accuracy score. Held-out accuracy is reported
+separately in `results.json` and in CI, and is not gated.
+
+`results.json` also reports **confidence calibration**: accuracy per confidence
+bucket, and mean confidence on correct versus incorrect fields. The model's
+`confidence` is a self-reported number, not a measured probability; until the
+buckets separate, the UI labels it **uncalibrated**. Every fix and every known
+limitation is recorded in [`EVAL_LOG.md`](./EVAL_LOG.md).
+
 ## The contract
 
 `src/lib/contracts/fill-form.ts` is the single source of truth. The route
@@ -123,10 +157,9 @@ Three rules keep the swap cheap:
    and `EXPECT_REAL=1 bun run smoke <url>` fails the build if production is
    still on the mock.
 3. `src/lib/fixtures/cases.json` is both the UI's example data and the eval
-   set — 5 real-world cases (invoices, a job application, a shipping
-   confirmation, a support ticket). Current mock baseline: **7/7** on
-   `invoice-basic`, **1/3** on `invoice-unlabelled`. Those numbers are the gap
-   the real provider has to close.
+   set — 30 real-world cases across ordinary extraction, absent fields,
+   contradictions, unusual formats, noisy threads and Kenyan-English phrasing.
+   The held-out split is never tuned against.
 
 ## Structured output from Claude
 

@@ -4,17 +4,45 @@
 		"description": "Clean invoice email. Every field is present and labelled.",
 		"request": {
 			"fields": [
-				{ "id": "invoice_number", "label": "Invoice Number", "type": "text" },
-				{ "id": "vendor", "label": "Vendor", "type": "text" },
-				{ "id": "invoice_date", "label": "Invoice Date", "type": "date" },
-				{ "id": "due_date", "label": "Due Date", "type": "date" },
-				{ "id": "total_amount", "label": "Total", "type": "number" },
-				{ "id": "contact_email", "label": "Contact", "type": "email" },
+				{
+					"id": "invoice_number",
+					"label": "Invoice Number",
+					"type": "text"
+				},
+				{
+					"id": "vendor",
+					"label": "Vendor",
+					"type": "text"
+				},
+				{
+					"id": "invoice_date",
+					"label": "Invoice Date",
+					"type": "date"
+				},
+				{
+					"id": "due_date",
+					"label": "Due Date",
+					"type": "date"
+				},
+				{
+					"id": "total_amount",
+					"label": "Total",
+					"type": "number"
+				},
+				{
+					"id": "contact_email",
+					"label": "Contact",
+					"type": "email"
+				},
 				{
 					"id": "status",
 					"label": "Status",
 					"type": "select",
-					"options": ["paid", "unpaid", "overdue"]
+					"options": [
+						"paid",
+						"unpaid",
+						"overdue"
+					]
 				}
 			],
 			"source": "Riverbank Supplies Ltd\nInvoice Number: RS-2291\nVendor: Riverbank Supplies Ltd\nInvoice Date: 2026-08-14\nDue Date: 2026-09-13\n\nLine items\n  40x conduit clip           KES 4,800\n  12x junction box           KES 9,600\n  Delivery                   KES 1,200\n\nTotal: 15600\nStatus: unpaid\nContact: accounts@riverbank.co.ke\n\nPlease reference the invoice number on payment."
@@ -27,16 +55,30 @@
 			"total_amount": "15600",
 			"contact_email": "accounts@riverbank.co.ke",
 			"status": "unpaid"
-		}
+		},
+		"split": "tuning",
+		"category": "ordinary"
 	},
 	{
 		"id": "invoice-unlabelled",
 		"description": "Same data, prose form, no field labels. The mock scores badly here on purpose — this is the case a real model has to win.",
 		"request": {
 			"fields": [
-				{ "id": "invoice_number", "label": "Invoice Number", "type": "text" },
-				{ "id": "total_amount", "label": "Total", "type": "number" },
-				{ "id": "contact_email", "label": "Contact", "type": "email" }
+				{
+					"id": "invoice_number",
+					"label": "Invoice Number",
+					"type": "text"
+				},
+				{
+					"id": "total_amount",
+					"label": "Total",
+					"type": "number"
+				},
+				{
+					"id": "contact_email",
+					"label": "Contact",
+					"type": "email"
+				}
 			],
 			"source": "Hi Stephen — following up on RS-2291 from last month. We had it down as 15,600 all in, due mid-September. Anything you need from our side, drop me a line at accounts@riverbank.co.ke and I will sort it out.\n\nThanks,\nWanjiru"
 		},
@@ -44,17 +86,35 @@
 			"invoice_number": "RS-2291",
 			"total_amount": "15600",
 			"contact_email": "accounts@riverbank.co.ke"
-		}
+		},
+		"split": "tuning",
+		"category": "ordinary"
 	},
 	{
 		"id": "job-application",
 		"description": "Freeform job application email — labels are conversational, not form fields, and the salary line uses a range instead of a single number.",
 		"request": {
 			"fields": [
-				{ "id": "applicant_name", "label": "Applicant Name", "type": "text" },
-				{ "id": "applicant_email", "label": "Applicant Email", "type": "email" },
-				{ "id": "position", "label": "Position Applied For", "type": "text" },
-				{ "id": "start_date", "label": "Available Start Date", "type": "date" }
+				{
+					"id": "applicant_name",
+					"label": "Applicant Name",
+					"type": "text"
+				},
+				{
+					"id": "applicant_email",
+					"label": "Applicant Email",
+					"type": "email"
+				},
+				{
+					"id": "position",
+					"label": "Position Applied For",
+					"type": "text"
+				},
+				{
+					"id": "start_date",
+					"label": "Available Start Date",
+					"type": "date"
+				}
 			],
 			"source": "Hi hiring team,\n\nMy name is Grace Njoroge and I'd like to apply for the Backend Engineer role you posted. I'm currently finishing a contract and could start 2026-10-01. Happy to do a call any time — best reach me at grace.njoroge@proton.me.\n\nBest,\nGrace"
 		},
@@ -63,39 +123,72 @@
 			"applicant_email": "grace.njoroge@proton.me",
 			"position": "Backend Engineer",
 			"start_date": "2026-10-01"
-		}
+		},
+		"split": "tuning",
+		"category": "ordinary"
 	},
 	{
 		"id": "shipping-confirmation",
 		"description": "Transactional shipping email with a table-like layout — values sit two spaces after their label on the same line.",
 		"request": {
 			"fields": [
-				{ "id": "order_number", "label": "Order", "type": "text" },
-				{ "id": "carrier", "label": "Carrier", "type": "text" },
-				{ "id": "tracking_number", "label": "Tracking Number", "type": "text" },
-				{ "id": "ship_date", "label": "Ship Date", "type": "date" }
+				{
+					"id": "order_number",
+					"label": "Order",
+					"type": "text"
+				},
+				{
+					"id": "carrier",
+					"label": "Carrier",
+					"type": "text"
+				},
+				{
+					"id": "tracking_number",
+					"label": "Tracking Number",
+					"type": "text"
+				},
+				{
+					"id": "ship_date",
+					"label": "Ship Date",
+					"type": "date"
+				}
 			],
 			"source": "Your order has shipped!\n\nOrder  #ORD-88231\nCarrier  G4S Kenya\nTracking Number  GK99012345KE\nShip Date  2026-09-01\n\nEstimated delivery in 3-5 business days."
 		},
 		"expected": {
-			"order_number": "#ORD-88231",
+			"order_number": "ORD-88231",
 			"carrier": "G4S Kenya",
 			"tracking_number": "GK99012345KE",
 			"ship_date": "2026-09-01"
-		}
+		},
+		"split": "tuning",
+		"category": "ordinary"
 	},
 	{
 		"id": "support-ticket",
 		"description": "Customer support ticket with a select field whose value only appears as a synonym ('down since yesterday' implying priority high), testing whether extraction infers rather than only pattern-matches.",
 		"request": {
 			"fields": [
-				{ "id": "customer_email", "label": "Customer Email", "type": "email" },
-				{ "id": "account_id", "label": "Account ID", "type": "text" },
+				{
+					"id": "customer_email",
+					"label": "Customer Email",
+					"type": "email"
+				},
+				{
+					"id": "account_id",
+					"label": "Account ID",
+					"type": "text"
+				},
 				{
 					"id": "priority",
 					"label": "Priority",
 					"type": "select",
-					"options": ["low", "medium", "high", "urgent"]
+					"options": [
+						"low",
+						"medium",
+						"high",
+						"urgent"
+					]
 				}
 			],
 			"source": "Ticket #4471\nFrom: ops@mombasafreight.co.ke\nAccount: MF-1042\n\nOur dashboard has been completely down since yesterday morning and we're losing visibility into every shipment in transit. This is urgent, please escalate."
@@ -104,6 +197,921 @@
 			"customer_email": "ops@mombasafreight.co.ke",
 			"account_id": "MF-1042",
 			"priority": "urgent"
+		},
+		"split": "tuning",
+		"category": "ordinary"
+	},
+	{
+		"id": "mpesa-receipt",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "M-Pesa SMS. Four fields, all present. Date is DD/M/YY.",
+		"request": {
+			"fields": [
+				{
+					"id": "transaction_code",
+					"label": "Transaction Code",
+					"type": "text"
+				},
+				{
+					"id": "recipient",
+					"label": "Recipient",
+					"type": "text"
+				},
+				{
+					"id": "amount",
+					"label": "Amount",
+					"type": "number"
+				},
+				{
+					"id": "pay_date",
+					"label": "Pay Date",
+					"type": "date"
+				}
+			],
+			"source": "SJK8P2LQ4 Confirmed. Ksh2,500.00 sent to JOHN KAMAU on 25/9/26 at 3:14 PM. New M-PESA balance is Ksh 8,412.50. Transaction cost 0.00. Always confirm the name before entering your M-PESA PIN."
+		},
+		"expected": {
+			"transaction_code": "SJK8P2LQ4",
+			"recipient": "JOHN KAMAU",
+			"amount": "2500",
+			"pay_date": "2026-09-25"
+		}
+	},
+	{
+		"id": "payslip-september",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "Salary advice with aligned columns and thousands separators. Pay date DD/MM/YYYY.",
+		"request": {
+			"fields": [
+				{
+					"id": "employee_name",
+					"label": "Employee Name",
+					"type": "text"
+				},
+				{
+					"id": "gross_pay",
+					"label": "Gross Pay",
+					"type": "number"
+				},
+				{
+					"id": "net_pay",
+					"label": "Net Pay",
+					"type": "number"
+				},
+				{
+					"id": "pay_date",
+					"label": "Pay Date",
+					"type": "date"
+				}
+			],
+			"source": "SALARY ADVICE — SEPTEMBER 2026\nEastlands Logistics Ltd | Pay date: 30/09/2026\n\nName:  Achieng Odera\nBasic:      92,000.00\nPAYE:     -18,400.00\nSHIF:       -4,600.00\nNSSF:       -2,160.00\nNet pay:   66,840.00\n\nPaid to Equity Bank ****4417"
+		},
+		"expected": {
+			"employee_name": "Achieng Odera",
+			"gross_pay": "92000",
+			"net_pay": "66840",
+			"pay_date": "2026-09-30"
+		}
+	},
+	{
+		"id": "school-fees-invoice",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "School fees invoice: dotted leaders, carried-forward balance, deposit credit. Line items sum to the stated total — verify as you go.",
+		"request": {
+			"fields": [
+				{
+					"id": "student_name",
+					"label": "Student Name",
+					"type": "text"
+				},
+				{
+					"id": "admission_number",
+					"label": "Admission Number",
+					"type": "text"
+				},
+				{
+					"id": "amount_due",
+					"label": "Amount Due",
+					"type": "number"
+				},
+				{
+					"id": "deadline",
+					"label": "Payment Deadline",
+					"type": "date"
+				}
+			],
+			"source": "ST. MARY'S GIRLS — TERM 3, 2026 FEES INVOICE\n\nStudent: Wanjiru Kamau\nAdm No: SMG-2024-0871\n\nBalance brought forward ........ KES 12,500\nTerm 3 tuition .................. KES 38,000\nLunch levy ...................... KES 6,500\nLess deposit received 12/09 ..... -KES 10,000\nTOTAL DUE ....................... KES 47,000\n\nPay before 05/10/2026. M-Pesa Paybill 554000, account = admission number."
+		},
+		"expected": {
+			"student_name": "Wanjiru Kamau",
+			"admission_number": "SMG-2024-0871",
+			"amount_due": "47000",
+			"deadline": "2026-10-05"
+		}
+	},
+	{
+		"id": "rental-receipt",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "Handwritten-style rent receipt, prose rather than labels.",
+		"request": {
+			"fields": [
+				{
+					"id": "receipt_no",
+					"label": "Receipt Number",
+					"type": "text"
+				},
+				{
+					"id": "tenant",
+					"label": "Tenant",
+					"type": "text"
+				},
+				{
+					"id": "unit",
+					"label": "Unit",
+					"type": "text"
+				},
+				{
+					"id": "amount",
+					"label": "Amount",
+					"type": "number"
+				},
+				{
+					"id": "received_on",
+					"label": "Received On",
+					"type": "date"
+				}
+			],
+			"source": "RENT RECEIPT\nNo. 1147\n\nReceived from Brian Otieno, flat B4, Kilimani Court, the sum of KES 35,000 only being rent for the month of October 2026. Paid via M-Pesa ref JK82P0QW1 on 24/09/2026.\n\nLandlady: Muthoni Wanyama"
+		},
+		"expected": {
+			"receipt_no": 1147,
+			"tenant": "Brian Otieno",
+			"unit": "B4",
+			"amount": "35000",
+			"received_on": "2026-09-24"
+		}
+	},
+	{
+		"id": "hotel-booking",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "Booking confirmation where values sit below their labels, plus a time next to the check-in date.",
+		"request": {
+			"fields": [
+				{
+					"id": "guest_name",
+					"label": "Guest Name",
+					"type": "text"
+				},
+				{
+					"id": "confirmation_no",
+					"label": "Confirmation Number",
+					"type": "text"
+				},
+				{
+					"id": "check_in",
+					"label": "Check-in Date",
+					"type": "date"
+				},
+				{
+					"id": "check_out",
+					"label": "Check-out Date",
+					"type": "date"
+				},
+				{
+					"id": "total_amount",
+					"label": "Total Amount",
+					"type": "number"
+				}
+			],
+			"source": "Booking confirmed — 14 Treetops Lodge\nHi Peter,\n\nYour reservation is confirmed. See details below.\n\nConfirmation #: TT-55219\nGuest: Peter Mwangi\nCheck-in: 02/10/2026 from 14:00\nCheck-out: 05/10/2026\nTotal for 3 nights: KES 41,850 (incl. VAT)\n\nSee you soon!\nThe Treetops Team"
+		},
+		"expected": {
+			"guest_name": "Peter Mwangi",
+			"confirmation_no": "TT-55219",
+			"check_in": "2026-10-02",
+			"check_out": "2026-10-05",
+			"total_amount": "41850"
+		}
+	},
+	{
+		"id": "kplc-bill",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "Utility statement. Billing period is written 'Aug 2026' — expected is that string as written.",
+		"request": {
+			"fields": [
+				{
+					"id": "account_number",
+					"label": "Account Number",
+					"type": "text"
+				},
+				{
+					"id": "billing_period",
+					"label": "Billing Period",
+					"type": "text"
+				},
+				{
+					"id": "units_used",
+					"label": "Units Used",
+					"type": "number"
+				},
+				{
+					"id": "amount_due",
+					"label": "Amount Due",
+					"type": "number"
+				},
+				{
+					"id": "due_date",
+					"label": "Due Date",
+					"type": "date"
+				}
+			],
+			"source": "KENYA POWER — PREPAID STATEMENT\nAccount: 5420881\nMeter: 3301-7742\nPeriod: Aug 2026\n\nUnits purchased this period: 210 kWh\nAmount: KES 5,320\nPay by 30/09/2026 to avoid disconnection.\nM-Pesa Paybill 8888880, account 5420881."
+		},
+		"expected": {
+			"account_number": 5420881,
+			"billing_period": "Aug 2026",
+			"units_used": "210",
+			"amount_due": "5320",
+			"due_date": "2026-09-30"
+		}
+	},
+	{
+		"id": "sacco-loan-statement",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "SACCO statement as-at a stated date. 'Arrears: Nil' must not leak into any field.",
+		"request": {
+			"fields": [
+				{
+					"id": "member_name",
+					"label": "Member Name",
+					"type": "text"
+				},
+				{
+					"id": "member_no",
+					"label": "Member Number",
+					"type": "text"
+				},
+				{
+					"id": "loan_balance",
+					"label": "Loan Balance",
+					"type": "number"
+				},
+				{
+					"id": "installment",
+					"label": "Installment",
+					"type": "number"
+				},
+				{
+					"id": "next_payment_date",
+					"label": "Next Payment Date",
+					"type": "date"
+				}
+			],
+			"source": "UKUNDA SACCO — LOAN STATEMENT AS AT 15/09/2026\nMember: Faith Adhiambo | Member No: US-3391\nLoan: Development | Balance: KES 214,300\n\nInstallment: KES 12,400 due on 05/10/2026\nLast payment received: 05/09/2026 — KES 12,400\nArrears: Nil"
+		},
+		"expected": {
+			"member_name": "Faith Adhiambo",
+			"member_no": "US-3391",
+			"loan_balance": "214300",
+			"installment": "12400",
+			"next_payment_date": "2026-10-05"
+		}
+	},
+	{
+		"id": "saas-renewal",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "Subscription renewal email with plan, seats, USD amount. Two amounts appear (USD 240.00/year) — read the labels.",
+		"request": {
+			"fields": [
+				{
+					"id": "plan_name",
+					"label": "Plan Name",
+					"type": "text"
+				},
+				{
+					"id": "seats",
+					"label": "Seats",
+					"type": "number"
+				},
+				{
+					"id": "amount",
+					"label": "Amount",
+					"type": "number"
+				},
+				{
+					"id": "currency",
+					"label": "Currency",
+					"type": "text"
+				},
+				{
+					"id": "renewal_date",
+					"label": "Renewal Date",
+					"type": "date"
+				}
+			],
+			"source": "Your workspace renews soon\n\nHi team,\n\nFormStack Pro (annual) is set to renew on 14/10/2026.\nPlan: Pro — 12 seats\nBilling: USD 240.00 / year to card ending 4417.\n\nManage billing: https://app.example.com/billing\nYou're receiving this because you're the billing contact."
+		},
+		"expected": {
+			"plan_name": "Pro",
+			"seats": "12",
+			"amount": "240",
+			"currency": "USD",
+			"renewal_date": "2026-10-14"
+		}
+	},
+	{
+		"id": "cv-profile",
+		"category": "ordinary",
+		"split": "tuning",
+		"description": "CV parsing. years_experience comes from prose ('7 years' experience'), not a labelled field. Name is all-caps — expected is as written.",
+		"request": {
+			"fields": [
+				{
+					"id": "full_name",
+					"label": "Full Name",
+					"type": "text"
+				},
+				{
+					"id": "current_role",
+					"label": "Current Role",
+					"type": "text"
+				},
+				{
+					"id": "years_experience",
+					"label": "Years of Experience",
+					"type": "number"
+				},
+				{
+					"id": "email",
+					"label": "Email",
+					"type": "email"
+				}
+			],
+			"source": "KIPRONO CHEPKOECH\nNairobi, Kenya | 0712 555 809 | kiprono.c@fastmail.com\n\nSUMMARY\nDevOps engineer with 7 years' experience running Kubernetes clusters for fintech teams.\n\nEXPERIENCE\n2021–present   DevOps Engineer, Latify Payments\n2018–2021      Systems Administrator, WebSense"
+		},
+		"expected": {
+			"full_name": "KIPRONO CHEPKOECH",
+			"current_role": "DevOps Engineer",
+			"years_experience": "7",
+			"email": "kiprono.c@fastmail.com"
+		}
+	},
+	{
+		"id": "claim-missing-policy",
+		"category": "absent-field",
+		"split": "tuning",
+		"description": "Insurance claim intake over WhatsApp. The agent explicitly asks for the policy number and the claimant never gives it: expected null, never a guess. A phone number and an incident date sit nearby as traps.",
+		"request": {
+			"fields": [
+				{
+					"id": "claimant_name",
+					"label": "Claimant Name",
+					"type": "text"
+				},
+				{
+					"id": "incident_date",
+					"label": "Incident Date",
+					"type": "date"
+				},
+				{
+					"id": "claim_amount",
+					"label": "Claim Amount",
+					"type": "number"
+				},
+				{
+					"id": "policy_number",
+					"label": "Policy Number",
+					"type": "text"
+				}
+			],
+			"source": "*CLAIM INTAKE*\nAmina: Hi, I want to lodge a motor vehicle claim\nAmina: The incident happened on 19/09/2026 along Ngong Road\nAmina: Rear bumper damaged, nobody injured\nAgent: Sorry about that. Kindly share your policy number\nAmina: I'll check the folder and send\nAgent: And the estimate?\nAmina: Garage quoted KES 48,000\nAgent: Received. We'll follow up on the policy."
+		},
+		"expected": {
+			"claimant_name": "Amina",
+			"incident_date": "2026-09-19",
+			"claim_amount": "48000",
+			"policy_number": null
+		}
+	},
+	{
+		"id": "receipt-missing-due-date",
+		"category": "absent-field",
+		"split": "held-out",
+		"description": "Payment confirmation references invoice RS-2291 but never states when it was originally due: due_date expected null. paid_on is the payment date, not the due date — the classic confusion this case exists to catch.",
+		"request": {
+			"fields": [
+				{
+					"id": "payer",
+					"label": "Payer",
+					"type": "text"
+				},
+				{
+					"id": "amount_paid",
+					"label": "Amount Paid",
+					"type": "number"
+				},
+				{
+					"id": "paid_on",
+					"label": "Paid On",
+					"type": "date"
+				},
+				{
+					"id": "due_date",
+					"label": "Due Date",
+					"type": "date"
+				}
+			],
+			"source": "PAYMENT RECEIVED\n\nThanks, your payment of KES 15,600 for invoice RS-2291 has been received.\nPaid by Jane Mutiso on 20/09/2026. Balance now zero.\n\n— Riverbank Supplies Ltd"
+		},
+		"expected": {
+			"payer": "Jane Mutiso",
+			"amount_paid": "15600",
+			"paid_on": "2026-09-20",
+			"due_date": null
+		}
+	},
+	{
+		"id": "order-not-shipped",
+		"category": "absent-field",
+		"split": "held-out",
+		"description": "Order is only being prepared: carrier, ship_date and tracking_number all expected null. A promised future timeframe ('within 2 working days') must not become a date.",
+		"request": {
+			"fields": [
+				{
+					"id": "order_number",
+					"label": "Order Number",
+					"type": "text"
+				},
+				{
+					"id": "carrier",
+					"label": "Carrier",
+					"type": "text"
+				},
+				{
+					"id": "ship_date",
+					"label": "Ship Date",
+					"type": "date"
+				},
+				{
+					"id": "tracking_number",
+					"label": "Tracking Number",
+					"type": "text"
+				}
+			],
+			"source": "Order #ORD-90412 is being prepared\n\nHi Mercy,\n\nWe've received your order and it's with our packing team. You'll get a tracking number as soon as it leaves the warehouse — usually within 2 working days.\n\n— Sokoni Store"
+		},
+		"expected": {
+			"order_number": "ORD-90412",
+			"carrier": null,
+			"ship_date": null,
+			"tracking_number": null
+		}
+	},
+	{
+		"id": "applicant-missing-kra",
+		"category": "absent-field",
+		"split": "tuning",
+		"description": "Job application with no KRA PIN anywhere: kra_pin expected null. A phone number sits in the same slot a lazy extraction would grab — value must not be borrowed from a neighbouring field.",
+		"request": {
+			"fields": [
+				{
+					"id": "applicant_name",
+					"label": "Applicant Name",
+					"type": "text"
+				},
+				{
+					"id": "email",
+					"label": "Email",
+					"type": "email"
+				},
+				{
+					"id": "years_experience",
+					"label": "Years of Experience",
+					"type": "number"
+				},
+				{
+					"id": "kra_pin",
+					"label": "KRA PIN",
+					"type": "text"
+				}
+			],
+			"source": "From: d.mwangi@gmail.com\nSubject: Application — Data Analyst role\n\nDear Hiring Team,\n\nI am Daniel Mwangi, currently a Data Analyst at Numtrace with 5 years of experience in SQL and Python. I've attached my CV.\n\nRegards,\nDaniel\n0721 445 908"
+		},
+		"expected": {
+			"applicant_name": "Daniel Mwangi",
+			"email": "d.mwangi@gmail.com",
+			"years_experience": "5",
+			"kra_pin": null
+		}
+	},
+	{
+		"id": "delivery-slot-missing",
+		"category": "absent-field",
+		"split": "held-out",
+		"description": "Delivery date given, time slot only promised for later: delivery_slot expected null. 'We'll SMS you a 2-hour time slot' is a commitment, not a value.",
+		"request": {
+			"fields": [
+				{
+					"id": "order_number",
+					"label": "Order Number",
+					"type": "text"
+				},
+				{
+					"id": "delivery_date",
+					"label": "Delivery Date",
+					"type": "date"
+				},
+				{
+					"id": "delivery_slot",
+					"label": "Delivery Time Slot",
+					"type": "text"
+				}
+			],
+			"source": "Your order is on the way\nOrder: 4471-88233\nDelivery date: 03/10/2026\nWe'll SMS you a 2-hour time slot on the morning of delivery.\nTrack: shop.example.co.ke/t/4471-88233"
+		},
+		"expected": {
+			"order_number": "4471-88233",
+			"delivery_date": "2026-10-03",
+			"delivery_slot": null
+		}
+	},
+	{
+		"id": "quote-then-correction",
+		"category": "contradictory",
+		"split": "tuning",
+		"description": "Quoted reply contains an old figure, newest message corrects it. Policy: the explicit correction wins — expected is the corrected total, not the quoted one.",
+		"request": {
+			"fields": [
+				{
+					"id": "supplier",
+					"label": "Supplier",
+					"type": "text"
+				},
+				{
+					"id": "quote_ref",
+					"label": "Quote Reference",
+					"type": "text"
+				},
+				{
+					"id": "total_amount",
+					"label": "Total Amount",
+					"type": "number"
+				}
+			],
+			"source": "On Tue, 22 Sep 2026, Alloy Fabrics wrote:\n> Quote AF-771: 60m canvas, KES 62,000.\n\nCorrection — please ignore the figure above. The correct total for AF-771 is KES 58,700 after the bulk discount. Apologies for the mix-up.\n\n— Alison, Alloy Fabrics"
+		},
+		"expected": {
+			"supplier": "Alloy Fabrics",
+			"quote_ref": "AF-771",
+			"total_amount": "58700"
+		}
+	},
+	{
+		"id": "meeting-moved",
+		"category": "contradictory",
+		"split": "held-out",
+		"description": "Reschedule notice contains both dates. final_date is the new one, original_date the superseded one, venue the new room only (not the floor or the old room).",
+		"request": {
+			"fields": [
+				{
+					"id": "attendee",
+					"label": "Attendee",
+					"type": "text"
+				},
+				{
+					"id": "original_date",
+					"label": "Original Date",
+					"type": "date"
+				},
+				{
+					"id": "final_date",
+					"label": "Final Date",
+					"type": "date"
+				},
+				{
+					"id": "venue",
+					"label": "Venue",
+					"type": "text"
+				}
+			],
+			"source": "Hi all,\n\nScratch the earlier note — our review is moved from 25/09/2026 to 28/09/2026. Same time, but the venue is now Boardroom B (Arcade was booked).\n\nNjeri"
+		},
+		"expected": {
+			"attendee": null,
+			"original_date": "2026-09-25",
+			"final_date": "2026-09-28",
+			"venue": "Boardroom B"
+		}
+	},
+	{
+		"id": "amount-corrected-on-call",
+		"category": "contradictory",
+		"split": "tuning",
+		"description": "Email restates an invoice figure and then supersedes it with the agreed balance. Policy: the amount the sender says to pay wins; the older figure appears only to be dismissed.",
+		"request": {
+			"fields": [
+				{
+					"id": "client",
+					"label": "Client",
+					"type": "text"
+				},
+				{
+					"id": "invoice_ref",
+					"label": "Invoice Reference",
+					"type": "text"
+				},
+				{
+					"id": "amount_due",
+					"label": "Amount Due",
+					"type": "number"
+				}
+			],
+			"source": "From: accounts@kilimanjaro-epc.co.ke\nSubject: RE: Invoice KI-2099\n\nConfirming what we agreed on the phone: the figure on the invoice (KES 71,400) was before the retainer credit. The balance you should pay is KES 64,900. Kindly disregard the older amount.\n\nRegards,\nWanjala"
+		},
+		"expected": {
+			"client": null,
+			"invoice_ref": "KI-2099",
+			"amount_due": "64900"
+		}
+	},
+	{
+		"id": "relative-deadline",
+		"category": "unusual-format",
+		"split": "held-out",
+		"description": "Relative deadline: 'next Tuesday' with an explicit send date. POLICY: relative dates are intentionally not resolved — a calendar date must never be computed from the send date, so deadline is expected null. The send date and weekday are traps, not values. contact is the signature number.",
+		"request": {
+			"fields": [
+				{
+					"id": "project",
+					"label": "Project",
+					"type": "text"
+				},
+				{
+					"id": "deadline",
+					"label": "Deadline",
+					"type": "date"
+				},
+				{
+					"id": "contact",
+					"label": "Contact",
+					"type": "text"
+				}
+			],
+			"source": "From: ops@starline-events.co.ke\nDate: Friday, 18 September 2026\nSubject: Setup deadline\n\nHi,\n\nCrew must be on site next Tuesday for the Starline Expo setup. Load-in starts 07:00.\n\nRegards,\nWambui Kariuki | 0720 111 445"
+		},
+		"expected": {
+			"project": "Starline Expo",
+			"deadline": null,
+			"contact": "Wambui Kariuki"
+		}
+	},
+	{
+		"id": "compact-figures",
+		"category": "unusual-format",
+		"split": "tuning",
+		"description": "Suffix shorthand: 'k' = thousands. Expected values are full digits ('2500', '38000'). The 'of 4k' budget ceiling is not budget_used.",
+		"request": {
+			"fields": [
+				{
+					"id": "campaign",
+					"label": "Campaign",
+					"type": "text"
+				},
+				{
+					"id": "registrations",
+					"label": "Registrations",
+					"type": "number"
+				},
+				{
+					"id": "budget_used",
+					"label": "Budget Used",
+					"type": "number"
+				},
+				{
+					"id": "reach",
+					"label": "Reach",
+					"type": "number"
+				}
+			],
+			"source": "Campaign recap — Mazingira Walk\nRegistrations: 1,240\nBudget used: 2.5k of 4k\nReach: 38k impressions\nCost per signup: ~161\n\nFull deck: drive.example.com/x/9f2"
+		},
+		"expected": {
+			"campaign": "Mazingira Walk",
+			"registrations": "1240",
+			"budget_used": "2500",
+			"reach": "38000"
+		}
+	},
+	{
+		"id": "mixed-date-formats",
+		"category": "unusual-format",
+		"split": "held-out",
+		"description": "Two date styles in one document: DD/MM/YYYY and D-Mon-YY, both DD/MM-based. monthly_premium is the monthly figure; the annual figure is present only as a distractor.",
+		"request": {
+			"fields": [
+				{
+					"id": "member_name",
+					"label": "Member Name",
+					"type": "text"
+				},
+				{
+					"id": "policy_start",
+					"label": "Policy Start",
+					"type": "date"
+				},
+				{
+					"id": "renewal_date",
+					"label": "Renewal Date",
+					"type": "date"
+				},
+				{
+					"id": "monthly_premium",
+					"label": "Monthly Premium",
+					"type": "number"
+				}
+			],
+			"source": "Member: S. Njoroge\nPolicy start: 03/09/2026\nRenewal: 3-Sep-27\nPremium: Ksh1,250 per month (Ksh 15,000 annually)\n\nQueries? help@msfco.co.ke"
+		},
+		"expected": {
+			"member_name": "S. Njoroge",
+			"policy_start": "2026-09-03",
+			"renewal_date": "2027-09-03",
+			"monthly_premium": "1250"
+		}
+	},
+	{
+		"id": "forwarded-invoice-thread",
+		"category": "noisy-thread",
+		"split": "tuning",
+		"description": "Forwarded Re:Re: chain: signature block, disclaimer, iPhone footer, quoted history with no figures. The only real values live in the newest message. vendor is the signature name exactly.",
+		"request": {
+			"fields": [
+				{
+					"id": "invoice_number",
+					"label": "Invoice Number",
+					"type": "text"
+				},
+				{
+					"id": "total_amount",
+					"label": "Total Amount",
+					"type": "number"
+				},
+				{
+					"id": "vendor",
+					"label": "Vendor",
+					"type": "text"
+				}
+			],
+			"source": "---------- Forwarded message ----------\nFrom: Billing <billing@nyahera-traders.co.ke>\nDate: Mon, 15 Sep 2026 at 09:14\nSubject: Re: Re: Re: statements\n\nHi,\nPlease see the updated statement. Invoice NT-4482 covers the September order — total KES 133,200.\n\nRegards,\nBilling Desk | Nyahera Traders Ltd\nDISCLAIMER: This email and any attachments are confidential and intended solely for the addressee.\n\n> On 12 Sep 2026, You wrote:\n> Kindly send the August statement.\n>\n> On 09 Sep 2026, Billing wrote:\n> We are processing your request.\n\n--\nSent from my iPhone"
+		},
+		"expected": {
+			"invoice_number": "NT-4482",
+			"total_amount": "133200",
+			"vendor": "Nyahera Traders Ltd"
+		}
+	},
+	{
+		"id": "whatsapp-group-order",
+		"category": "noisy-thread",
+		"split": "held-out",
+		"description": "Group chat with off-topic chatter, a correction mid-thread, and two PO numbers. The question 'ref for the chairs?' anchors the answer; driver is the person speaking at the end. quantity is the corrected figure, not the first one mentioned for desks.",
+		"request": {
+			"fields": [
+				{
+					"id": "order_ref",
+					"label": "Order Reference",
+					"type": "text"
+				},
+				{
+					"id": "quantity",
+					"label": "Quantity",
+					"type": "number"
+				},
+				{
+					"id": "driver",
+					"label": "Driver",
+					"type": "text"
+				}
+			],
+			"source": "*WAREHOUSE PL*\nBoss K: morning team\nSam: karibu, loading the Kisumu truck now\nJoy: don't forget the office chairs\nSam: ✅ chairs on\nBoss K: ref for the chairs?\nSam: PO-7719 — 14 pcs\nJoy: and the desks are 6, not 8\nDriver: picking up at 2pm — Alvan"
+		},
+		"expected": {
+			"order_ref": "PO-7719",
+			"quantity": "14",
+			"driver": "Alvan"
+		}
+	},
+	{
+		"id": "marketing-footer-burial",
+		"category": "noisy-thread",
+		"split": "tuning",
+		"description": "One-line dispatch note buried under a promo block, unsubscribe links and a legal footer. Marketing copy contains numbers (40%, 2026 in the reg number) that belong to no field.",
+		"request": {
+			"fields": [
+				{
+					"id": "shipment_id",
+					"label": "Shipment ID",
+					"type": "text"
+				},
+				{
+					"id": "warehouse",
+					"label": "Warehouse",
+					"type": "text"
+				},
+				{
+					"id": "dispatch_date",
+					"label": "Dispatch Date",
+					"type": "date"
+				}
+			],
+			"source": "Hi there,\n\nYour dispatch note: shipment SHP-3391 left our Athi River warehouse on 24/09/2026.\n\n—\n\nTHE SPRING SALE IS ON — up to 40% off sitewide!\nShop now → shop.example.co.ke\n\nYou're receiving this because you opted in. Unsubscribe here | Manage preferences\n\nExample Ltd, Mombasa Road, Nairobi. Reg. No. PVT-9921."
+		},
+		"expected": {
+			"shipment_id": "SHP-3391",
+			"warehouse": "Athi River",
+			"dispatch_date": "2026-09-24"
+		}
+	},
+	{
+		"id": "as-per-conversation",
+		"category": "kenyan-english",
+		"split": "held-out",
+		"description": "Kenyan business email: 'as per our conversation', 'balance as per today', 'close of business'. due_by is the stated processing deadline, not the 'today' reference date. contact_phone is the signature number.",
+		"request": {
+			"fields": [
+				{
+					"id": "amount_due",
+					"label": "Amount Due",
+					"type": "number"
+				},
+				{
+					"id": "reference",
+					"label": "Reference",
+					"type": "text"
+				},
+				{
+					"id": "due_by",
+					"label": "Process By",
+					"type": "date"
+				},
+				{
+					"id": "contact_phone",
+					"label": "Contact Phone",
+					"type": "text"
+				}
+			],
+			"source": "From: j.kamau@riftlogistics.co.ke\nSubject: As per our conversation\n\nHi Otieno,\n\nAs per our conversation, please find the figures below:\n\nRef: RL/2026/0887\nAmount due: Ksh 84,500\nBalance as per today, 23/09/2026, is as above.\nPlease process before close of business on 30/09/2026.\n\nKind regards,\nJane Kamau\n0733 660 118"
+		},
+		"expected": {
+			"amount_due": "84500",
+			"reference": "RL/2026/0887",
+			"due_by": "2026-09-30",
+			"contact_phone": "0733 660 118"
+		}
+	},
+	{
+		"id": "kindly-confirm-dividend",
+		"category": "kenyan-english",
+		"split": "tuning",
+		"description": "SACCO notice in formal Kenyan register: 'Kindly confirm the details below', 'We shall pay'. branch is the branch name only, not 'Nakuru CBD branch'.",
+		"request": {
+			"fields": [
+				{
+					"id": "member_name",
+					"label": "Member Name",
+					"type": "text"
+				},
+				{
+					"id": "branch",
+					"label": "Branch",
+					"type": "text"
+				},
+				{
+					"id": "dividend_amount",
+					"label": "Dividend",
+					"type": "number"
+				},
+				{
+					"id": "payment_date",
+					"label": "Payment Date",
+					"type": "date"
+				}
+			],
+			"source": "Uwamu Sacco notice — 2025 dividend\n\nDear member,\n\nKindly confirm the details below before we release your payment:\n\nName: Grace Wairimu\nBranch: Nakuru CBD\nDividend: KES 9,760\nWe shall pay on 10/10/2026 to your registered account.\n\nFor assistance, visit any branch or call 0800 720 000."
+		},
+		"expected": {
+			"member_name": "Grace Wairimu",
+			"branch": "Nakuru CBD",
+			"dividend_amount": "9760",
+			"payment_date": "2026-10-10"
 		}
 	}
 ]
