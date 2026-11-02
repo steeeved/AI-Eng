@@ -21,3 +21,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Eval output (eval-badge.json IS committed — the README badge reads it)
+results.json
