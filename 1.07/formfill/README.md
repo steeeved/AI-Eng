@@ -86,6 +86,13 @@ bun run eval                                  # writes results.json
 bun run gate                                  # 95% tuning + zero invented
 ```
 
+The paid 30-case evaluation is **manual-only**. It does not run on pushes or
+pull requests. The final portfolio snapshot is
+[`eval-results/2026-11-18.json`](./eval-results/2026-11-18.json): 89/90 tuning
+fields (98.9%), 28/29 held-out fields (96.6%), zero invented values and zero
+run errors. Re-run it only when a deliberate model, prompt or contract change
+needs fresh evidence.
+
 The gate has two independent thresholds:
 
 | Gate | Threshold |
@@ -97,7 +104,7 @@ A run at 99% with one invented value fails. An invented value — a plausible
 answer for a field the source never contained — is a different error class from
 a miss: a clerk can fill a blank, but nobody catches a confident wrong number.
 It is never averaged into the accuracy score. Held-out accuracy is reported
-separately in `results.json` and in CI, and is not gated.
+separately in the saved result, and is not gated.
 
 `results.json` also reports **confidence calibration**: accuracy per confidence
 bucket, and mean confidence on correct versus incorrect fields. The model's

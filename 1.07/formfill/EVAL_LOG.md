@@ -84,6 +84,7 @@ expected value is only defensible if the rule behind it is written down.
 | 5 | 2026-11-02 | claude-haiku-4-5 | 89/90 (98.9%) | 27/29 (93.1%) | 1 | Prompt: return only the value, no adjacent words. Did not fix `relative-deadline.project` (`Starline Expo setup`). Changed `saas-renewal.plan_name` from `FormStack Pro (annual)` to `Pro` — the fixture says "read the labels", and the explicit label is `Plan: Pro`, so the label was corrected to `Pro` rather than the prompt. |
 | 6 | 2026-11-02 | claude-haiku-4-5 | 89/90 (98.9%) | 28/29 (96.6%) | 0 | Prompt: a signature names the sender, not an attendee. `meeting-moved` now 4/4 and the invented gate passes. Remaining: `relative-deadline.project` (held-out) and `saas-renewal.plan_name`, which flips between `Pro` and `FormStack Pro` across runs. |
 | 7 | 2026-11-02 | claude-haiku-4-5 | 89/90 (98.9%) | 28/29 (96.6%) | 0 | Confirmation rerun, no changes. Identical counts, gate passed twice: tuning 98.9%, held-out 96.6%, invented 0. |
+| 8 | 2026-11-18 | claude-haiku-4-5 | 89/90 (98.9%) | 28/29 (96.6%) | 0 | Final paid portfolio run, no changes. The same two known limitations reproduced; zero run errors. Saved as `eval-results/2026-11-18.json`. Future paid runs are manual-only. |
 
 ## Error categories
 

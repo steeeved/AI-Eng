@@ -1,0 +1,1223 @@
+{
+  "generatedAt": "2026-11-18T03:04:38.785Z",
+  "base": "http://127.0.0.1:4173",
+  "provider": "anthropic",
+  "cases": [
+    {
+      "id": "invoice-basic",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Clean invoice email. Every field is present and labelled.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 2159,
+      "ticks": 66,
+      "fields": [
+        {
+          "id": "invoice_number",
+          "expected": "RS-2291",
+          "actual": "RS-2291",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "vendor",
+          "expected": "Riverbank Supplies Ltd",
+          "actual": "Riverbank Supplies Ltd",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "invoice_date",
+          "expected": "2026-08-14",
+          "actual": "2026-08-14",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "due_date",
+          "expected": "2026-09-13",
+          "actual": "2026-09-13",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "total_amount",
+          "expected": "15600",
+          "actual": "15600",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "contact_email",
+          "expected": "accounts@riverbank.co.ke",
+          "actual": "accounts@riverbank.co.ke",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "status",
+          "expected": "unpaid",
+          "actual": "unpaid",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "invoice-unlabelled",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Same data, prose form, no field labels. The mock scores badly here on purpose — this is the case a real model has to win.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1233,
+      "ticks": 32,
+      "fields": [
+        {
+          "id": "invoice_number",
+          "expected": "RS-2291",
+          "actual": "RS-2291",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "total_amount",
+          "expected": "15600",
+          "actual": "15600",
+          "confidence": 0.9,
+          "status": "correct"
+        },
+        {
+          "id": "contact_email",
+          "expected": "accounts@riverbank.co.ke",
+          "actual": "accounts@riverbank.co.ke",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "job-application",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Freeform job application email — labels are conversational, not form fields, and the salary line uses a range instead of a single number.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1357,
+      "ticks": 43,
+      "fields": [
+        {
+          "id": "applicant_name",
+          "expected": "Grace Njoroge",
+          "actual": "Grace Njoroge",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "applicant_email",
+          "expected": "grace.njoroge@proton.me",
+          "actual": "grace.njoroge@proton.me",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "position",
+          "expected": "Backend Engineer",
+          "actual": "Backend Engineer",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "start_date",
+          "expected": "2026-10-01",
+          "actual": "2026-10-01",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "shipping-confirmation",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Transactional shipping email with a table-like layout — values sit two spaces after their label on the same line.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1390,
+      "ticks": 39,
+      "fields": [
+        {
+          "id": "order_number",
+          "expected": "ORD-88231",
+          "actual": "ORD-88231",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "carrier",
+          "expected": "G4S Kenya",
+          "actual": "G4S Kenya",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "tracking_number",
+          "expected": "GK99012345KE",
+          "actual": "GK99012345KE",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "ship_date",
+          "expected": "2026-09-01",
+          "actual": "2026-09-01",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "support-ticket",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Customer support ticket with a select field whose value only appears as a synonym ('down since yesterday' implying priority high), testing whether extraction infers rather than only pattern-matches.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1262,
+      "ticks": 32,
+      "fields": [
+        {
+          "id": "customer_email",
+          "expected": "ops@mombasafreight.co.ke",
+          "actual": "ops@mombasafreight.co.ke",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "account_id",
+          "expected": "MF-1042",
+          "actual": "MF-1042",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "priority",
+          "expected": "urgent",
+          "actual": "urgent",
+          "confidence": 0.9,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "mpesa-receipt",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "M-Pesa SMS. Four fields, all present. Date is DD/M/YY.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1412,
+      "ticks": 38,
+      "fields": [
+        {
+          "id": "transaction_code",
+          "expected": "SJK8P2LQ4",
+          "actual": "SJK8P2LQ4",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "recipient",
+          "expected": "JOHN KAMAU",
+          "actual": "JOHN KAMAU",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "amount",
+          "expected": "2500",
+          "actual": "2500.00",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "pay_date",
+          "expected": "2026-09-25",
+          "actual": "2026-09-25",
+          "confidence": 0.95,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "payslip-september",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Salary advice with aligned columns and thousands separators. Pay date DD/MM/YYYY.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1814,
+      "ticks": 38,
+      "fields": [
+        {
+          "id": "employee_name",
+          "expected": "Achieng Odera",
+          "actual": "Achieng Odera",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "gross_pay",
+          "expected": "92000",
+          "actual": "92000.00",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "net_pay",
+          "expected": "66840",
+          "actual": "66840.00",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "pay_date",
+          "expected": "2026-09-30",
+          "actual": "2026-09-30",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "school-fees-invoice",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "School fees invoice: dotted leaders, carried-forward balance, deposit credit. Line items sum to the stated total — verify as you go.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1812,
+      "ticks": 40,
+      "fields": [
+        {
+          "id": "student_name",
+          "expected": "Wanjiru Kamau",
+          "actual": "Wanjiru Kamau",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "admission_number",
+          "expected": "SMG-2024-0871",
+          "actual": "SMG-2024-0871",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "amount_due",
+          "expected": "47000",
+          "actual": "47000",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "deadline",
+          "expected": "2026-10-05",
+          "actual": "2026-10-05",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "rental-receipt",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Handwritten-style rent receipt, prose rather than labels.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1539,
+      "ticks": 43,
+      "fields": [
+        {
+          "id": "receipt_no",
+          "expected": 1147,
+          "actual": "1147",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "tenant",
+          "expected": "Brian Otieno",
+          "actual": "Brian Otieno",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "unit",
+          "expected": "B4",
+          "actual": "B4",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "amount",
+          "expected": "35000",
+          "actual": "35000",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "received_on",
+          "expected": "2026-09-24",
+          "actual": "2026-09-24",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "hotel-booking",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Booking confirmation where values sit below their labels, plus a time next to the check-in date.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1562,
+      "ticks": 47,
+      "fields": [
+        {
+          "id": "guest_name",
+          "expected": "Peter Mwangi",
+          "actual": "Peter Mwangi",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "confirmation_no",
+          "expected": "TT-55219",
+          "actual": "TT-55219",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "check_in",
+          "expected": "2026-10-02",
+          "actual": "2026-10-02",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "check_out",
+          "expected": "2026-10-05",
+          "actual": "2026-10-05",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "total_amount",
+          "expected": "41850",
+          "actual": "41850",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "kplc-bill",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Utility statement. Billing period is written 'Aug 2026' — expected is that string as written.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1484,
+      "ticks": 46,
+      "fields": [
+        {
+          "id": "account_number",
+          "expected": 5420881,
+          "actual": "5420881",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "billing_period",
+          "expected": "Aug 2026",
+          "actual": "Aug 2026",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "units_used",
+          "expected": "210",
+          "actual": "210",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "amount_due",
+          "expected": "5320",
+          "actual": "5320",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "due_date",
+          "expected": "2026-09-30",
+          "actual": "2026-09-30",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "sacco-loan-statement",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "SACCO statement as-at a stated date. 'Arrears: Nil' must not leak into any field.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1527,
+      "ticks": 48,
+      "fields": [
+        {
+          "id": "member_name",
+          "expected": "Faith Adhiambo",
+          "actual": "Faith Adhiambo",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "member_no",
+          "expected": "US-3391",
+          "actual": "US-3391",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "loan_balance",
+          "expected": "214300",
+          "actual": "214300",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "installment",
+          "expected": "12400",
+          "actual": "12400",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "next_payment_date",
+          "expected": "2026-10-05",
+          "actual": "2026-10-05",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "saas-renewal",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "Subscription renewal email with plan, seats, USD amount. Two amounts appear (USD 240.00/year) — read the labels.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1541,
+      "ticks": 44,
+      "fields": [
+        {
+          "id": "plan_name",
+          "expected": "Pro",
+          "actual": "FormStack Pro",
+          "confidence": 0.95,
+          "status": "wrong"
+        },
+        {
+          "id": "seats",
+          "expected": "12",
+          "actual": "12",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "amount",
+          "expected": "240",
+          "actual": "240.00",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "currency",
+          "expected": "USD",
+          "actual": "USD",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "renewal_date",
+          "expected": "2026-10-14",
+          "actual": "2026-10-14",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "cv-profile",
+      "split": "tuning",
+      "category": "ordinary",
+      "description": "CV parsing. years_experience comes from prose ('7 years' experience'), not a labelled field. Name is all-caps — expected is as written.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1445,
+      "ticks": 41,
+      "fields": [
+        {
+          "id": "full_name",
+          "expected": "KIPRONO CHEPKOECH",
+          "actual": "KIPRONO CHEPKOECH",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "current_role",
+          "expected": "DevOps Engineer",
+          "actual": "DevOps Engineer",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "years_experience",
+          "expected": "7",
+          "actual": "7",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "email",
+          "expected": "kiprono.c@fastmail.com",
+          "actual": "kiprono.c@fastmail.com",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "claim-missing-policy",
+      "split": "tuning",
+      "category": "absent-field",
+      "description": "Insurance claim intake over WhatsApp. The agent explicitly asks for the policy number and the claimant never gives it: expected null, never a guess. A phone number and an incident date sit nearby as traps.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1776,
+      "ticks": 38,
+      "fields": [
+        {
+          "id": "claimant_name",
+          "expected": "Amina",
+          "actual": "Amina",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "incident_date",
+          "expected": "2026-09-19",
+          "actual": "2026-09-19",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "claim_amount",
+          "expected": "48000",
+          "actual": "48000",
+          "confidence": 0.9,
+          "status": "correct"
+        },
+        {
+          "id": "policy_number",
+          "expected": null,
+          "actual": null,
+          "confidence": 1,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "receipt-missing-due-date",
+      "split": "held-out",
+      "category": "absent-field",
+      "description": "Payment confirmation references invoice RS-2291 but never states when it was originally due: due_date expected null. paid_on is the payment date, not the due date — the classic confusion this case exists to catch.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1432,
+      "ticks": 36,
+      "fields": [
+        {
+          "id": "payer",
+          "expected": "Jane Mutiso",
+          "actual": "Jane Mutiso",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "amount_paid",
+          "expected": "15600",
+          "actual": "15600",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "paid_on",
+          "expected": "2026-09-20",
+          "actual": "2026-09-20",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "due_date",
+          "expected": null,
+          "actual": null,
+          "confidence": 1,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "order-not-shipped",
+      "split": "held-out",
+      "category": "absent-field",
+      "description": "Order is only being prepared: carrier, ship_date and tracking_number all expected null. A promised future timeframe ('within 2 working days') must not become a date.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1349,
+      "ticks": 35,
+      "fields": [
+        {
+          "id": "order_number",
+          "expected": "ORD-90412",
+          "actual": "ORD-90412",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "carrier",
+          "expected": null,
+          "actual": null,
+          "confidence": 1,
+          "status": "correct"
+        },
+        {
+          "id": "ship_date",
+          "expected": null,
+          "actual": null,
+          "confidence": 1,
+          "status": "correct"
+        },
+        {
+          "id": "tracking_number",
+          "expected": null,
+          "actual": null,
+          "confidence": 1,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "applicant-missing-kra",
+      "split": "tuning",
+      "category": "absent-field",
+      "description": "Job application with no KRA PIN anywhere: kra_pin expected null. A phone number sits in the same slot a lazy extraction would grab — value must not be borrowed from a neighbouring field.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1763,
+      "ticks": 38,
+      "fields": [
+        {
+          "id": "applicant_name",
+          "expected": "Daniel Mwangi",
+          "actual": "Daniel Mwangi",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "email",
+          "expected": "d.mwangi@gmail.com",
+          "actual": "d.mwangi@gmail.com",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "years_experience",
+          "expected": "5",
+          "actual": "5",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "kra_pin",
+          "expected": null,
+          "actual": null,
+          "confidence": 1,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "delivery-slot-missing",
+      "split": "held-out",
+      "category": "absent-field",
+      "description": "Delivery date given, time slot only promised for later: delivery_slot expected null. 'We'll SMS you a 2-hour time slot' is a commitment, not a value.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1263,
+      "ticks": 30,
+      "fields": [
+        {
+          "id": "order_number",
+          "expected": "4471-88233",
+          "actual": "4471-88233",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "delivery_date",
+          "expected": "2026-10-03",
+          "actual": "2026-10-03",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "delivery_slot",
+          "expected": null,
+          "actual": null,
+          "confidence": 0.95,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "quote-then-correction",
+      "split": "tuning",
+      "category": "contradictory",
+      "description": "Quoted reply contains an old figure, newest message corrects it. Policy: the explicit correction wins — expected is the corrected total, not the quoted one.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1243,
+      "ticks": 29,
+      "fields": [
+        {
+          "id": "supplier",
+          "expected": "Alloy Fabrics",
+          "actual": "Alloy Fabrics",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "quote_ref",
+          "expected": "AF-771",
+          "actual": "AF-771",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "total_amount",
+          "expected": "58700",
+          "actual": "58700",
+          "confidence": 0.9,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "meeting-moved",
+      "split": "held-out",
+      "category": "contradictory",
+      "description": "Reschedule notice contains both dates. final_date is the new one, original_date the superseded one, venue the new room only (not the floor or the old room).",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1447,
+      "ticks": 37,
+      "fields": [
+        {
+          "id": "attendee",
+          "expected": null,
+          "actual": null,
+          "confidence": 1,
+          "status": "correct"
+        },
+        {
+          "id": "original_date",
+          "expected": "2026-09-25",
+          "actual": "2026-09-25",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "final_date",
+          "expected": "2026-09-28",
+          "actual": "2026-09-28",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "venue",
+          "expected": "Boardroom B",
+          "actual": "Boardroom B",
+          "confidence": 0.95,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "amount-corrected-on-call",
+      "split": "tuning",
+      "category": "contradictory",
+      "description": "Email restates an invoice figure and then supersedes it with the agreed balance. Policy: the amount the sender says to pay wins; the older figure appears only to be dismissed.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1166,
+      "ticks": 28,
+      "fields": [
+        {
+          "id": "client",
+          "expected": null,
+          "actual": null,
+          "confidence": 0,
+          "status": "correct"
+        },
+        {
+          "id": "invoice_ref",
+          "expected": "KI-2099",
+          "actual": "KI-2099",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "amount_due",
+          "expected": "64900",
+          "actual": "64900",
+          "confidence": 0.95,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "relative-deadline",
+      "split": "held-out",
+      "category": "unusual-format",
+      "description": "Relative deadline: 'next Tuesday' with an explicit send date. POLICY: relative dates are intentionally not resolved — a calendar date must never be computed from the send date, so deadline is expected null. The send date and weekday are traps, not values. contact is the signature number.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1540,
+      "ticks": 30,
+      "fields": [
+        {
+          "id": "project",
+          "expected": "Starline Expo",
+          "actual": "Starline Expo setup",
+          "confidence": 0.95,
+          "status": "wrong"
+        },
+        {
+          "id": "deadline",
+          "expected": null,
+          "actual": null,
+          "confidence": 1,
+          "status": "correct"
+        },
+        {
+          "id": "contact",
+          "expected": "Wambui Kariuki",
+          "actual": "Wambui Kariuki",
+          "confidence": 0.95,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "compact-figures",
+      "split": "tuning",
+      "category": "unusual-format",
+      "description": "Suffix shorthand: 'k' = thousands. Expected values are full digits ('2500', '38000'). The 'of 4k' budget ceiling is not budget_used.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1339,
+      "ticks": 37,
+      "fields": [
+        {
+          "id": "campaign",
+          "expected": "Mazingira Walk",
+          "actual": "Mazingira Walk",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "registrations",
+          "expected": "1240",
+          "actual": "1240",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "budget_used",
+          "expected": "2500",
+          "actual": "2500",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "reach",
+          "expected": "38000",
+          "actual": "38000",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "mixed-date-formats",
+      "split": "held-out",
+      "category": "unusual-format",
+      "description": "Two date styles in one document: DD/MM/YYYY and D-Mon-YY, both DD/MM-based. monthly_premium is the monthly figure; the annual figure is present only as a distractor.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1406,
+      "ticks": 39,
+      "fields": [
+        {
+          "id": "member_name",
+          "expected": "S. Njoroge",
+          "actual": "S. Njoroge",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "policy_start",
+          "expected": "2026-09-03",
+          "actual": "2026-09-03",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "renewal_date",
+          "expected": "2027-09-03",
+          "actual": "2027-09-03",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "monthly_premium",
+          "expected": "1250",
+          "actual": "1250",
+          "confidence": 0.95,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "forwarded-invoice-thread",
+      "split": "tuning",
+      "category": "noisy-thread",
+      "description": "Forwarded Re:Re: chain: signature block, disclaimer, iPhone footer, quoted history with no figures. The only real values live in the newest message. vendor is the signature name exactly.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1186,
+      "ticks": 31,
+      "fields": [
+        {
+          "id": "invoice_number",
+          "expected": "NT-4482",
+          "actual": "NT-4482",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "total_amount",
+          "expected": "133200",
+          "actual": "133200",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "vendor",
+          "expected": "Nyahera Traders Ltd",
+          "actual": "Nyahera Traders Ltd",
+          "confidence": 0.95,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "whatsapp-group-order",
+      "split": "held-out",
+      "category": "noisy-thread",
+      "description": "Group chat with off-topic chatter, a correction mid-thread, and two PO numbers. The question 'ref for the chairs?' anchors the answer; driver is the person speaking at the end. quantity is the corrected figure, not the first one mentioned for desks.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1243,
+      "ticks": 27,
+      "fields": [
+        {
+          "id": "order_ref",
+          "expected": "PO-7719",
+          "actual": "PO-7719",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "quantity",
+          "expected": "14",
+          "actual": "14",
+          "confidence": 0.9,
+          "status": "correct"
+        },
+        {
+          "id": "driver",
+          "expected": "Alvan",
+          "actual": "Alvan",
+          "confidence": 0.95,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "marketing-footer-burial",
+      "split": "tuning",
+      "category": "noisy-thread",
+      "description": "One-line dispatch note buried under a promo block, unsubscribe links and a legal footer. Marketing copy contains numbers (40%, 2026 in the reg number) that belong to no field.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1227,
+      "ticks": 31,
+      "fields": [
+        {
+          "id": "shipment_id",
+          "expected": "SHP-3391",
+          "actual": "SHP-3391",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "warehouse",
+          "expected": "Athi River",
+          "actual": "Athi River",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "dispatch_date",
+          "expected": "2026-09-24",
+          "actual": "2026-09-24",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "as-per-conversation",
+      "split": "held-out",
+      "category": "kenyan-english",
+      "description": "Kenyan business email: 'as per our conversation', 'balance as per today', 'close of business'. due_by is the stated processing deadline, not the 'today' reference date. contact_phone is the signature number.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1404,
+      "ticks": 38,
+      "fields": [
+        {
+          "id": "amount_due",
+          "expected": "84500",
+          "actual": "84500",
+          "confidence": 0.95,
+          "status": "correct"
+        },
+        {
+          "id": "reference",
+          "expected": "RL/2026/0887",
+          "actual": "RL/2026/0887",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "due_by",
+          "expected": "2026-09-30",
+          "actual": "2026-09-30",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "contact_phone",
+          "expected": "0733 660 118",
+          "actual": "0733 660 118",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    },
+    {
+      "id": "kindly-confirm-dividend",
+      "split": "tuning",
+      "category": "kenyan-english",
+      "description": "SACCO notice in formal Kenyan register: 'Kindly confirm the details below', 'We shall pay'. branch is the branch name only, not 'Nakuru CBD branch'.",
+      "model": "claude-haiku-4-5-20251001",
+      "latencyMs": 1454,
+      "ticks": 39,
+      "fields": [
+        {
+          "id": "member_name",
+          "expected": "Grace Wairimu",
+          "actual": "Grace Wairimu",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "branch",
+          "expected": "Nakuru CBD",
+          "actual": "Nakuru CBD",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "dividend_amount",
+          "expected": "9760",
+          "actual": "9760",
+          "confidence": 0.99,
+          "status": "correct"
+        },
+        {
+          "id": "payment_date",
+          "expected": "2026-10-10",
+          "actual": "2026-10-10",
+          "confidence": 0.99,
+          "status": "correct"
+        }
+      ]
+    }
+  ],
+  "runErrors": [],
+  "overall": {
+    "correct": 117,
+    "wrong": 2,
+    "miss": 0,
+    "invented": 0,
+    "total": 119,
+    "accuracy": 0.9831932773109243
+  },
+  "splits": {
+    "tuning": {
+      "correct": 89,
+      "wrong": 1,
+      "miss": 0,
+      "invented": 0,
+      "total": 90,
+      "accuracy": 0.9888888888888889
+    },
+    "held-out": {
+      "correct": 28,
+      "wrong": 1,
+      "miss": 0,
+      "invented": 0,
+      "total": 29,
+      "accuracy": 0.9655172413793104
+    }
+  },
+  "invented": {
+    "count": 0,
+    "fields": []
+  },
+  "calibration": {
+    "buckets": {
+      "<0.50": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1
+      },
+      "0.85–0.94": {
+        "total": 5,
+        "correct": 5,
+        "accuracy": 1
+      },
+      "0.95–1.00": {
+        "total": 113,
+        "correct": 111,
+        "accuracy": 0.9823008849557522
+      }
+    },
+    "meanConfidenceCorrect": 0.965726495726496,
+    "meanConfidenceIncorrect": 0.95,
+    "note": "Confidence is a number the model writes, not a measured probability. Treat the buckets as a report until they separate clearly."
+  }
+}

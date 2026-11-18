@@ -1,18 +1,20 @@
 name: formfill-eval
 
 on:
-  push:
-    paths:
-      - "1.07/formfill/**"
-      - ".github/workflows/formfill-eval.yml"
-  pull_request:
-    paths:
-      - "1.07/formfill/**"
-      - ".github/workflows/formfill-eval.yml"
+  # This suite makes 30 paid provider calls. It is deliberately manual-only;
+  # ordinary pushes and pull requests use the free typecheck/build checks.
   workflow_dispatch:
+    inputs:
+      confirm_paid_calls:
+        description: "Confirm the paid 30-case Anthropic evaluation"
+        required: true
+        type: choice
+        options:
+          - RUN_PAID_EVAL
 
 jobs:
   formfill-golden-set:
+    if: ${{ inputs.confirm_paid_calls == 'RUN_PAID_EVAL' }}
     runs-on: ubuntu-latest
     defaults:
       run:
