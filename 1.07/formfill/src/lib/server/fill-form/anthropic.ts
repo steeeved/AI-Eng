@@ -77,6 +77,11 @@ function prompt(req: FillFormRequest): string {
 	return [
 		'Extract the requested fields from the source document below, then call record_extraction.',
 		'For each requested field, give its id, the extracted value as a string (or null if genuinely not present — never invent one), and your confidence from 0 to 1.',
+		'Normalise for the field type: dates as YYYY-MM-DD, numbers as plain digits (no commas, currency symbols, or k/m shorthand).',
+		'Do not compute relative or implied dates ("next Tuesday", "end of month", "in two weeks"). If the source does not state the date explicitly, return null for that field.',
+		'All day/month numeric dates (for example 03/10/2026) are DD/MM unless the source explicitly states otherwise. Never read them as MM/DD.',
+		'Return only the value itself. Do not append adjacent words, a role title, a second contact detail, or a billing cadence; stop at the field boundary.',
+		'A signature names the sender, not an attendee or participant. Do not use it for an attendee field unless the source says that person will attend.',
 		'',
 		'Fields to extract:',
 		spec,
@@ -155,6 +160,10 @@ export const anthropicProvider: FillFormProvider = {
 		try {
 			const { message } = await create({
 				model,
+				// A gate that flips between runs is not a gate. The eval re-runs the
+				// same cases; temperature 0 (or as close as the API offers) keeps the
+				// measurement about the prompt rather than sampling luck.
+				temperature: 0,
 				max_tokens: 1024,
 				tools: [EXTRACTION_TOOL],
 				tool_choice: { type: 'tool', name: 'record_extraction' },
@@ -224,6 +233,7 @@ export const anthropicProvider: FillFormProvider = {
 		const stream = client.messages.stream(
 			{
 				model,
+				temperature: 0,
 				max_tokens: 1024,
 				tools: [EXTRACTION_TOOL],
 				tool_choice: { type: 'tool', name: 'record_extraction' },

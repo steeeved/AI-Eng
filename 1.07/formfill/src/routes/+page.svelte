@@ -444,7 +444,7 @@
 			<Card.Header>
 				<Card.Title>Result</Card.Title>
 				<Card.Description>
-					{result.meta.model} · {result.meta.latencyMs}ms
+					{result.meta.model} · {result.meta.latencyMs}ms · confidence is self-reported, uncalibrated
 				</Card.Description>
 			</Card.Header>
 			<Card.Content class="space-y-1">
