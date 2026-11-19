@@ -11,6 +11,9 @@ dist/
 build/
 .tsbuildinfo
 
+# Private source corpora
+data/PPRA/
+
 # pnpm
 .pnpm-store/
 
