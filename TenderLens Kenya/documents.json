@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "corpusId": "tenderlens-ke-ppra-v1",
+  "selectedAt": "2026-11-18",
+  "publisher": "Public Procurement Regulatory Authority (Kenya)",
+  "officialIndexUrl": "https://ppra.go.ke/standard-tender-documents/",
+  "selectionPolicy": "Five different PPRA procurement document types from the website's updated 2022 set. Each file is versioned independently; this is not a history of five revisions of one document.",
+  "publicationConstraint": "The document covers state that reproduction, copying or distribution requires permission. Keep source files out of the public repository and deployment until reuse and excerpt-display permission is confirmed.",
+  "documents": [
+    {
+      "id": "ppra-works-building-2022",
+      "title": "Standard Tender Document for Procurement of Works - Building and Associated Civil Engineering Works",
+      "procurementCategory": "Works - building and associated civil engineering",
+      "publishedOrRevisedVersion": "Issued 2021-04-22; updated 2022-04-21",
+      "versionEvidence": "The rendered cover states both dates and says the update amended the Form of Tender and Beneficial Ownership Information Disclosure Form. The body also states that it was amended under PPRA Circular No. 02/2022.",
+      "officialUrl": "https://ppra.go.ke/download/std-for-works-building-and-associated-civil-engineering-works/",
+      "localPath": "../data/PPRA/DOC 1. STD FOR WORKS-BUILDING AND ASSOCIATED CIVIL ENGINEERING WORKS Rev April 2022.docx",
+      "retrievedAt": "2026-11-18",
+      "sha256": "09c857fa624b984f395340c76fb1cbc60f19239c9d69e1d15ab2ecddffffe654",
+      "sizeBytes": 2757448,
+      "pageCount": 159,
+      "pageCountMethod": "DOCX app properties",
+      "renderedPageCount": 158,
+      "verificationStatus": "Review required: confirm current PPRA version and reconcile page-count difference."
+    },
+    {
+      "id": "ppra-goods-2022",
+      "title": "Standard Tender Document for Procurement of Goods",
+      "procurementCategory": "Goods",
+      "publishedOrRevisedVersion": "Updated 2022 set; amended under PPRA Circular No. 02/2022",
+      "versionEvidence": "The document body states that it was amended and issued under PPRA Circular No. 02/2022. The DOCX core metadata was created on 2022-04-20 and modified on 2022-04-21; those metadata dates are supporting evidence, not an authoritative publication date.",
+      "officialUrl": "https://ppra.go.ke/standard-tender-documents/",
+      "localPath": "../data/PPRA/DOC 4. STD FOR PROCUREMENT OF GOODS.docx",
+      "retrievedAt": "2026-11-18",
+      "sha256": "ee081f608999d4b17fa7b83e005f0ac56a9befd811644c464a2f771224f05e81",
+      "sizeBytes": 2147064,
+      "pageCount": 103,
+      "pageCountMethod": "DOCX app properties and LibreOffice rendering agree",
+      "renderedPageCount": 103,
+      "verificationStatus": "Review required: confirm direct download-page URL and current PPRA version."
+    },
+    {
+      "id": "ppra-rfp-consulting-2022",
+      "title": "Standard Tender Document for Request for Proposals for Selection of Consulting Firms",
+      "procurementCategory": "Consulting services - firm selection",
+      "publishedOrRevisedVersion": "Issued 2021-04-22; updated 2022-04-21",
+      "versionEvidence": "The rendered cover states both dates and says the update amended the Form of Tender and Beneficial Ownership Information Disclosure Form. The body also states that it was amended under PPRA Circular No. 02/2022.",
+      "officialUrl": "https://ppra.go.ke/standard-tender-documents/",
+      "localPath": "../data/PPRA/DOC 5. STD FOR REQUEST FOR PROPOSAL.docx",
+      "retrievedAt": "2026-11-18",
+      "sha256": "7f141969b8d34e23f6ed8a922806e685cfcc030476ac951e03cb3cb063c90df5",
+      "sizeBytes": 2655124,
+      "pageCount": 122,
+      "pageCountMethod": "DOCX app properties and LibreOffice rendering agree",
+      "renderedPageCount": 122,
+      "verificationStatus": "Review required: confirm direct download-page URL and current PPRA version."
+    },
+    {
+      "id": "ppra-prequalification-works-goods-2022",
+      "title": "Standard Prequalification Document for Procurement of Works and Goods Contracts",
+      "procurementCategory": "Prequalification - works, goods, plant and equipment",
+      "publishedOrRevisedVersion": "PPRA 2022 publication; official page last updated 2022-06-10",
+      "versionEvidence": "The official PPRA download page gives a create date of 2022-05-09 and last-updated date of 2022-06-10. No explicit revision label was found in the extracted document text.",
+      "officialUrl": "https://ppra.go.ke/download/std-for-prequalification-document-for-procurement-of-works-goods-contracts/",
+      "localPath": "../data/PPRA/DOC 16. STD FOR PREQUALIFICATION DOCUMENT FOR PROCUREMENT OF WORKS &amp; GOODS CONTRACTS.docx",
+      "retrievedAt": "2026-11-18",
+      "sha256": "38078e5ef5c9b3b4aa33a127eb8d203b9383f9713ebbcd43e6c98dee0f0b5996",
+      "sizeBytes": 7943606,
+      "pageCount": 48,
+      "pageCountMethod": "DOCX app properties; LibreOffice render did not complete and must be verified manually",
+      "renderedPageCount": null,
+      "verificationStatus": "Review required: verify page count, current PPRA version and redistribution status."
+    },
+    {
+      "id": "ppra-rfq-2022",
+      "title": "Standard Request for Quotations",
+      "procurementCategory": "Request for quotations - small contracts for goods, works and non-consulting services",
+      "publishedOrRevisedVersion": "PPRA updated 2022 set; explicit revision date not found in extracted text",
+      "versionEvidence": "The file appears in the updated 2022 section of PPRA's Standard Tender Documents page. The DOCX core metadata was created on 2022-04-20 and modified on 2022-04-24; those metadata dates are supporting evidence, not an authoritative publication date.",
+      "officialUrl": "https://ppra.go.ke/standard-tender-documents/",
+      "localPath": "../data/PPRA/DOC 21. STD FOR REQUEST FOR QUOTATIONS (1).docx",
+      "retrievedAt": "2026-11-18",
+      "sha256": "52e8a9a01df6b810862eafc3140a613a406b7bcf870452a56876951d4087c664",
+      "sizeBytes": 3708084,
+      "pageCount": 23,
+      "pageCountMethod": "DOCX app properties; rendered page count must be verified manually",
+      "renderedPageCount": null,
+      "verificationStatus": "Review required: verify page count, direct download-page URL and current PPRA version."
+    }
+  ],
+  "inventoryNotes": {
+    "downloadedFileCount": 24,
+    "distinctFileCount": 23,
+    "exactDuplicates": [
+      {
+        "sha256": "d02bc1d8faca501689906c77eb8683c46c58c8da7df2b37689f4121facf3edac",
+        "files": [
+          "../data/PPRA/DOC 2. STD FOR PROCUREMENT OF WORKS OF WORKS-ROADS WATER BRIDGES. etc.docx",
+          "../data/PPRA/DOC 2. STD FOR PROCUREMENT OF WORKS OF WORKS-ROADS WATER BRIDGES. etc (1).docx"
+        ]
+      }
+    ]
+  }
+}
