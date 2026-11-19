@@ -14,3 +14,13 @@ The labelled evaluation dataset is kept local while PPRA redistribution and exce
 - development/held-out split not yet assigned
 
 The local labels retain document, page, section and quoted-span evidence so later retrieval experiments can be measured without publishing those excerpts prematurely.
+
+## End of 2026-11-19 stream
+
+- all 30 questions human-verified with stable evidence locators
+- provisional Prequalification cases replaced rather than weakening their labels
+- deterministic stratified split: 22 development / 8 held-out
+- frozen dataset SHA-256: `acca9154eeadc3506b0a919b2c161f727809bf9235b850240406092b7abfe6a3`
+- held-out retrieval remains locked from tuning
+
+The frozen JSON stays local. Its checksum, split method, validation script and aggregate retrieval results are public so the engineering claims remain auditable without publishing the evidence excerpts.
