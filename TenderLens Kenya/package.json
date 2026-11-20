@@ -5,6 +5,7 @@
   "scripts": {
     "dataset:freeze": "bun run scripts/freeze-dataset.ts",
     "passages:build": "bun run scripts/build-passages.ts",
+    "chunks:build": "bun run scripts/chunk-corpus.ts",
     "baseline": "bun run scripts/run-embedding-baseline.ts"
   },
   "dependencies": {
