@@ -23,4 +23,4 @@ The local labels retain document, page, section and quoted-span evidence so late
 - frozen dataset SHA-256: `acca9154eeadc3506b0a919b2c161f727809bf9235b850240406092b7abfe6a3`
 - held-out retrieval remains locked from tuning
 
-The frozen JSON stays local. Its checksum, split method, validation script and aggregate retrieval results are public so the engineering claims remain auditable without publishing the evidence excerpts.
+The frozen JSON stays local. Its checksum, split method and validation script are public. Per-case ranks and aggregate retrieval results also stay local, consistent with `EMBEDDINGS.md`, until PPRA redistribution and excerpt-display permission is confirmed; after that, aggregate metrics may be published.
