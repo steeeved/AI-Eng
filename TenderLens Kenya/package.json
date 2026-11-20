@@ -1,0 +1,15 @@
+{
+  "name": "tenderlens-kenya-retrieval-baseline",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dataset:freeze": "bun run scripts/freeze-dataset.ts",
+    "passages:build": "bun run scripts/build-passages.ts",
+    "chunks:build": "bun run scripts/chunk-corpus.ts",
+    "baseline": "bun run scripts/run-embedding-baseline.ts"
+  },
+  "dependencies": {
+    "voyageai": "0.6.0",
+    "zod": "4.1.12"
+  }
+}

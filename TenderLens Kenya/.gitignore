@@ -1,6 +1,6 @@
 questions.draft.json
 questions.json
 passages.generated.json
+EMBEDDINGS.private.md
 .cache/
-results/*
-!results/development-voyage-4.json
+results/

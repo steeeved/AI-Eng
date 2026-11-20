@@ -34,8 +34,12 @@ build/
 *.log
 npm-debug.log*
 bun.lock
+!TenderLens Kenya/bun.lock
 .DS_Store
 *.tsbuildinfo
 .next/
 coverage/
 .turbo/
+
+# Local agent state
+.claude/
