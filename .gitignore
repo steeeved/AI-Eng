@@ -40,3 +40,6 @@ bun.lock
 .next/
 coverage/
 .turbo/
+
+# Local agent state
+.claude/
